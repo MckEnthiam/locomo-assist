@@ -231,12 +231,12 @@ model Report {
 ---
 ## References
 <div align="center">
-  <h1>1</h1>
-  <img src="readimg/1.png" alt="1" width="180"/>
-  <h1>2</h1>
-  <img src="readimg/2.png" alt="2" width="180"/>
-  <h1>3</h1>
-  <img src="readimg/3.png" alt="3" width="180"/>
+  <h3>1</h3>
+  <img src="readimg/1.png" alt="1" width="280"/>
+  <h3>2</h3>
+  <img src="readimg/2.png" alt="2" width="2800"/>
+  <h3>3</h3>
+  <img src="readimg/3.png" alt="3" width="280"/>
 </div>
 
 
