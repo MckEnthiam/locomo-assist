@@ -11,7 +11,6 @@
 </div>
 
 ---
-
 ## Le problème
 
 Chaque année au Togo, des milliers de vies basculent. Les AVC représentent la première cause de handicap moteur acquis chez l'adulte dans les centres hospitaliers de Lomé. A cela s'ajoute une explosion des traumatismes : plus de 60 % des accidents de la route au Togo impliquent des engins à deux-roues.
