@@ -265,6 +265,194 @@ L'exécutable est généré dans `dist-electron/`.
 
 ---
 
+## Stack technique
+
+### Frontend
+
+| Couche | Technologie |
+|---|---|
+| Framework | Next.js 14 (App Router) |
+| Langage | TypeScript strict |
+| UI | shadcn/ui + Tailwind CSS |
+| State | Zustand |
+| Détection de pose | MediaPipe Pose (WASM) |
+| Canvas | API Canvas 2D native |
+| Coach vocal | Web Speech API (voix FR) |
+| Graphes | Recharts |
+| PDF client | jsPDF + jsPDF-AutoTable |
+| Formulaires | React Hook Form + Zod |
+
+### Backend
+
+| Couche | Technologie |
+|---|---|
+| API | Next.js Route Handlers |
+| Base de données | PostgreSQL via Supabase |
+| ORM | Prisma |
+| Coach IA | Groq API + Gemini API (alternance) |
+| Génération PDF | PDFKit (Node.js) |
+| Stockage | Supabase Storage |
+
+### Infra
+
+| | |
+|---|---|
+| Déploiement | Vercel |
+| Linting | ESLint + Prettier |
+| Pre-commit | Husky |
+
+---
+
+## Architecture
+
+```
+locomoassist/
+├── app/
+│   ├── page.tsx                    # Dashboard principal
+│   ├── session/[exerciseId]/       # Vue session live
+│   ├── planning/                   # Planning hebdomadaire
+│   ├── progression/                # Graphes de progression
+│   ├── rapports/                   # Rapports PDF
+│   └── api/
+│       ├── coach/                  # POST → API
+│       ├── sessions/               # GET/POST sessions
+│       ├── exercises/              # Catalogue d'exercices
+│       ├── rapports/               # Génération PDF
+│       └── progression/            # Données agrégées
+├── components/
+│   ├── session/
+│   │   ├── CameraFeed.tsx          # Webcam PIP bas-gauche
+│   │   ├── PoseCanvas.tsx          # Overlay MediaPipe
+│   │   ├── SignalGraph.tsx         # Signal articulaire
+│   │   ├── AnglePanel.tsx          # Angles en temps réel
+│   │   └── CoachPanel.tsx          # Messages coach IA
+│   └── dashboard/
+├── lib/
+│   ├── mediapipe.ts                # Init MediaPipe Pose
+│   ├── angles.ts                   # Calcul angles articulaires
+│   ├── coach.ts                    # Logique API
+│   └── tts.ts                      # Web Speech API wrapper
+└── store/
+    ├── sessionStore.ts             # Etat session live (Zustand)
+    └── progressionStore.ts
+```
+
+---
+
+## Parcours utilisateur
+
+**1. Planification.** L'IA propose au patient sa session du jour adaptée à sa forme, avec une estimation des mouvements, tensions et durée.
+
+**2. Action.** Le patient pose son téléphone ou son PC, la caméra s'active, et l'IA commence à interagir vocalement avec lui tout au long des mouvements.
+
+**3. Suivi.** A la fin de la semaine, un rapport PDF complet est envoyé automatiquement au médecin ou téléchargeable pour la prochaine consultation.
+
+---
+
+## Installation
+
+### Prérequis
+
+- Node.js 18+
+- Un projet Supabase (PostgreSQL + Storage)
+- Une clé API Anthropic
+
+### Variables d'environnement
+
+Créer un fichier `.env.local` à la racine :
+
+```bash
+DATABASE_URL="postgresql://..."
+DIRECT_URL="postgresql://..."
+NEXT_PUBLIC_SUPABASE_URL="https://..."
+NEXT_PUBLIC_SUPABASE_ANON_KEY="..."
+SUPABASE_SERVICE_ROLE_KEY="..."
+GROQ_API_KEY="gsk_..."
+GEMINI_API_KEY="..."
+```
+
+### Lancer le projet
+
+```bash
+# Installer les dépendances
+npm install
+
+# Appliquer le schema et seeder la base
+npx prisma migrate dev
+npx prisma db seed
+
+# Lancer en développement
+npm run dev
+```
+
+L'application sera disponible sur [http://localhost:3000](http://localhost:3000).
+
+---
+
+## Modèle de données
+
+```prisma
+model Exercise {
+  id           String   @id @default(cuid())
+  name         String
+  bodyPart     String   // "epaule" | "coude" | "hanche" | "genou"
+  sets         Int
+  reps         Int
+  targetAngles Json     // { shoulder: 120, elbow: 110, ... }
+  refVideoUrl  String?
+}
+
+model Session {
+  id            String            @id @default(cuid())
+  startedAt     DateTime          @default(now())
+  weekNumber    Int
+  totalDuration Int?
+  exercises     SessionExercise[]
+  report        Report?
+}
+
+model SessionExercise {
+  id            String   @id @default(cuid())
+  avgAmplitude  Float?
+  peakAmplitude Float?
+  compensations Json?    // { lumbar: 3, shoulder: 1 }
+  signalData    Json?
+  coachMessages Json?
+}
+
+model Report {
+  id          String   @id @default(cuid())
+  weekNumber  Int
+  pdfUrl      String
+  generatedAt DateTime @default(now())
+}
+```
+
+---
+
+## Exercices disponibles (seed)
+
+| Exercice | Partie du corps | Sets x Reps |
+|---|---|---|
+| Flexion avant épaule | Epaule | 3 x 10 |
+| Rotation externe épaule | Epaule | 3 x 12 |
+| Abduction latérale | Epaule | 3 x 10 |
+| Pendule Codman | Epaule | 2 x 15 |
+| Mobilisation hanche | Hanche | 3 x 10 |
+
+---
+## References
+<div align="center">
+  <h3>Élévation latérale du bras</h3>
+  <img src="readimg/1.png" alt="Élévation latérale du bras" width="2800"/>
+  <h3>Abduction du bras</h3>
+  <img src="readimg/2.png" alt="Abduction du bras" width="2800"/>
+  <h3>Flexion du coude</h3>
+  <img src="readimg/3.png" alt="Flexion du coude" width="2800"/>
+</div>
+
+---
+
 ## Contexte
 
 Projet réalisé dans le cadre du **TCCHackDefend 2026**.
