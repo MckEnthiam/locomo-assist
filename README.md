@@ -50,6 +50,7 @@ En espaçant les déplacements obligatoires en clinique, nous divisons par trois
 |---|---|---|
 | <a href="https://github.com/koumekpoablam3-ux"><img src="https://github.com/koumekpoablam3-ux.png" width="40" height="40" style="border-radius:50%" alt="KOUMEKPO Rodrigue"/></a> | <a href="https://github.com/koumekpoablam3-ux">**KOUMEKPO Ablam Sotoh Rodrigue**</a> | Chef de projet |
 | <a href="https://github.com/MckEnthiam"><img src="https://github.com/MckEnthiam.png" width="40" height="40" style="border-radius:50%" alt="Ethiam"/></a> | <a href="https://github.com/MckEnthiam">**AKOSSOU Comlavi Didier Ethiam**</a> | Développement |
+| <a href="https://github.com/clairecodexx"><img src="https://github.com/clairecodexx.png" width="40" height="40" style="border-radius:50%" alt="claire"/></a> | <a href="https://github.com/clairecodexx">**Claire**</a> | Développement |
 
 ---
 
