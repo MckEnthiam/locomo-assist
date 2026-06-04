@@ -229,6 +229,18 @@ model Report {
 | Mobilisation hanche | Hanche | 3 x 10 |
 
 ---
+## References
+<div align="center">
+  <h1>1</h1>
+  <img src="readimg/1.png" alt="1" width="180"/>
+  <h1>2</h1>
+  <img src="readimg/2.png" alt="2" width="180"/>
+  <h1>3</h1>
+  <img src="readimg/3.png" alt="3" width="180"/>
+</div>
+
+
+---
 
 ## Contexte
 
