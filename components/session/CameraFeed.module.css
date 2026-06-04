@@ -1,0 +1,44 @@
+.pip {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  width: 110px;
+  height: 80px;
+  border: 0.5px solid var(--color-border);
+  border-radius: 5px;
+  overflow: hidden;
+  background: var(--color-surface);
+  z-index: 2;
+}
+
+.video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: var(--color-bg);
+}
+
+.timer {
+  position: absolute;
+  right: 4px;
+  bottom: 2px;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  padding: 0 3px;
+  border-radius: 2px;
+  border: 0.5px solid var(--color-border);
+}
+
+.pipError {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  width: 140px;
+  padding: 6px;
+  border: 0.5px solid var(--color-border);
+  border-radius: 5px;
+  background: var(--color-surface);
+  z-index: 2;
+}

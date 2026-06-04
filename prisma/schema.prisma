@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Exercise {
+  id            String            @id @default(cuid())
+  name          String
+  description   String
+  bodyPart      String
+  sets          Int
+  reps          Int
+  targetAngles  Json
+  refVideoUrl   String?
+  dayOfWeek     Int?
+  sortOrder     Int               @default(0)
+  createdAt     DateTime          @default(now())
+  sessions      SessionExercise[]
+  progressions  Progression[]
+}
+
+model Session {
+  id            String            @id @default(cuid())
+  startedAt     DateTime          @default(now())
+  endedAt       DateTime?
+  weekNumber    Int
+  dayType       String?
+  totalDuration Int?
+  exercises     SessionExercise[]
+  report        Report?
+}
+
+model SessionExercise {
+  id              String    @id @default(cuid())
+  sessionId       String
+  exerciseId      String
+  status          String
+  completedAt     DateTime?
+  setsCompleted   Int       @default(0)
+  repsCompleted   Int       @default(0)
+  avgAmplitude    Float?
+  peakAmplitude   Float?
+  compensations   Json?
+  signalData      Json?
+  coachMessages   Json?
+  durationSeconds Int?
+  session         Session   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  exercise        Exercise  @relation(fields: [exerciseId], references: [id])
+
+  @@index([sessionId])
+  @@index([exerciseId])
+}
+
+model Report {
+  id          String   @id @default(cuid())
+  sessionId   String   @unique
+  weekNumber  Int
+  generatedAt DateTime @default(now())
+  pdfUrl      String
+  summary     Json
+  session     Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+}
+
+model Progression {
+  id           String   @id @default(cuid())
+  date         DateTime @default(now())
+  bodyPart     String
+  angleDegrees Float
+  exerciseId   String
+  exercise     Exercise @relation(fields: [exerciseId], references: [id])
+
+  @@index([exerciseId])
+  @@index([date])
+}

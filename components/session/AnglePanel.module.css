@@ -1,0 +1,62 @@
+.section {
+  border-bottom: 0.5px solid var(--color-border);
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+}
+
+.title {
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: var(--color-text-primary);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 72px 1fr 36px;
+  align-items: center;
+  gap: 8px;
+}
+
+.label {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+.barTrack {
+  height: 2px;
+  background: var(--color-bg);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.barOk {
+  height: 2px;
+  background: var(--color-primary);
+}
+
+.barWarn {
+  height: 2px;
+  background: var(--color-warn);
+}
+
+.degOk {
+  font-size: 11px;
+  text-align: right;
+  color: var(--color-primary);
+}
+
+.degWarn {
+  font-size: 11px;
+  text-align: right;
+  color: var(--color-warn);
+}
