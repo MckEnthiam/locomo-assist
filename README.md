@@ -231,12 +231,12 @@ model Report {
 ---
 ## References
 <div align="center">
-  <h3>1</h3>
-  <img src="readimg/1.png" alt="1" width="2800"/>
-  <h3>2</h3>
-  <img src="readimg/2.png" alt="2" width="2800"/>
-  <h3>3</h3>
-  <img src="readimg/3.png" alt="3" width="2800"/>
+  <h3>Élévation latérale du bras</h3>
+  <img src="readimg/1.png" alt="Élévation latérale du bras" width="2800"/>
+  <h3>Abduction du bras</h3>
+  <img src="readimg/2.png" alt="Abduction du bras" width="2800"/>
+  <h3>Flexion du coude</h3>
+  <img src="readimg/3.png" alt="Flexion du coude" width="2800"/>
 </div>
 
 
