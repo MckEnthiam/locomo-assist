@@ -1,0 +1,22 @@
+.wrap {
+  position: relative;
+  flex: 1;
+  min-height: 200px;
+  border: 0.5px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  padding: 8px;
+}
+
+.alert {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 3;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-warn);
+  border-left: 2px solid var(--color-warn);
+  padding-left: 6px;
+  margin: 0;
+}

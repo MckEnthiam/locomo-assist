@@ -1,0 +1,58 @@
+.section {
+  border-bottom: 0.5px solid var(--color-border);
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+}
+
+.title {
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.empty {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.item {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  background: var(--color-primary);
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+
+.textOk {
+  font-size: 11px;
+  line-height: 1.5;
+  margin: 0;
+  padding-left: 6px;
+  border-left: 2px solid var(--color-primary);
+  color: var(--color-text-primary);
+}
+
+.textWarn {
+  font-size: 11px;
+  line-height: 1.5;
+  margin: 0;
+  padding-left: 6px;
+  border-left: 2px solid var(--color-warn);
+  color: var(--color-text-primary);
+}

@@ -1,0 +1,22 @@
+appId: com.locomoassist.app
+productName: LocomoAssist
+directories:
+  output: dist-electron-release
+files:
+  - dist/**/*
+  - dist-electron/**/*
+  - drizzle/migrations/**/*
+  - package.json
+extraResources:
+  - from: resources/exercises/
+    to: exercises/
+  - from: public/mediapipe/
+    to: mediapipe/
+  - from: public/logo.png
+    to: logo.png
+win:
+  target: nsis
+mac:
+  target: dmg
+linux:
+  target: AppImage
