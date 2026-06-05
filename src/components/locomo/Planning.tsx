@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CalendarDays, Clock, Dumbbell, ChevronRight } from "lucide-react";
+import { getTodayExercises } from "@/lib/localData";
 
 const DAY_LABELS = [
   "",
@@ -58,39 +59,29 @@ export function Planning({ onStartSession }: PlanningProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function load() {
-      let exercises: ExerciseItem[] = FALLBACK_EXERCISES;
-      try {
-        const res = await fetch("/api/exercises");
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data) && data.length > 0) exercises = data;
-        }
-      } catch {}
-      const grouped: PlanningDay[] = [];
-      for (let d = 1; d <= 5; d++) {
-        const dayExercises = exercises.filter((e) => e.dayOfWeek === d);
-        const estimatedMinutes = dayExercises.reduce(
-          (sum, ex) => sum + ex.sets * ex.reps * 0.05,
-          0
-        );
-        grouped.push({
-          dayOfWeek: d,
-          label: DAY_LABELS[d],
-          bodyPart:
-            dayExercises[0]?.bodyPart === "epaule"
-              ? "Epaule"
-              : dayExercises[0]?.bodyPart === "hanche"
-                ? "Hanche"
-                : "Readaptation",
-          exercises: dayExercises,
-          estimatedMinutes: Math.max(1, Math.round(estimatedMinutes)),
-        });
-      }
-      setDays(grouped);
-      setLoading(false);
+    const exercises = getTodayExercises();
+    const grouped: PlanningDay[] = [];
+    for (let d = 1; d <= 5; d++) {
+      const dayExercises = exercises.filter((e) => e.dayOfWeek === d);
+      const estimatedMinutes = dayExercises.reduce(
+        (sum, ex) => sum + ex.sets * ex.reps * 0.05,
+        0
+      );
+      grouped.push({
+        dayOfWeek: d,
+        label: DAY_LABELS[d],
+        bodyPart:
+          dayExercises[0]?.bodyPart === "epaule"
+            ? "Epaule"
+            : dayExercises[0]?.bodyPart === "hanche"
+              ? "Hanche"
+              : "Rééducation",
+        exercises: dayExercises,
+        estimatedMinutes: Math.max(1, Math.round(estimatedMinutes)),
+      });
     }
-    void load();
+    setDays(grouped);
+    setLoading(false);
   }, []);
 
   const jsDay = new Date().getDay();

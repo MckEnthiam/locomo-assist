@@ -14,6 +14,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { getProgressionData } from "@/lib/localData";
 
 interface ChartPoint {
   week: string;
@@ -50,24 +51,10 @@ export function Progression() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function load() {
-      try {
-        const res = await fetch("/api/progression");
-        if (res.ok) {
-          const data = await res.json();
-          setChartData(data.chartData?.length > 0 ? data.chartData : FALLBACK_CHART);
-          setWeekRows(data.weekRows?.length > 0 ? data.weekRows : FALLBACK_WEEKS);
-        } else {
-          setChartData(FALLBACK_CHART);
-          setWeekRows(FALLBACK_WEEKS);
-        }
-      } catch {
-        setChartData(FALLBACK_CHART);
-        setWeekRows(FALLBACK_WEEKS);
-      }
-      setLoading(false);
-    }
-    void load();
+    const data = getProgressionData();
+    setChartData(data.chartData?.length > 0 ? data.chartData : FALLBACK_CHART);
+    setWeekRows(data.weekRows?.length > 0 ? data.weekRows : FALLBACK_WEEKS);
+    setLoading(false);
   }, []);
 
   function formatDuration(seconds: number): string {

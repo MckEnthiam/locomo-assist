@@ -81,7 +81,7 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
   const lastCoachCall = useRef(0);
   const lastAngleUpdate = useRef(0);
   const lastSpokenRef = useRef("");
-  const prevAnglesRef = useRef<Record<string, number>>({});
+  const prevAnglesRef = useRef<Partial<JointAngles>>({});
   const recentMessagesRef = useRef<string[]>([]);
   const consecutiveGoodRef = useRef(0);
   const lastCompensationSpokenRef = useRef(0);
@@ -151,8 +151,8 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
 
   // Generate a dynamic, unique coaching message based on real-time data
   const generateDynamicMessage = useCallback((
-    currentAngles: Record<string, number>,
-    prevAngles: Record<string, number>,
+    currentAngles: Partial<JointAngles>,
+    prevAngles: Partial<JointAngles>,
     targets: JointAngles,
     exerciseName: string,
     exerciseTimeSec: number,
@@ -294,7 +294,8 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
   // Called by CameraView with real pose angles
   const handleCameraAngles = useCallback(
     (poseAngles: JointAngles, comps: { lumbar: boolean; shoulder: boolean }) => {
-      updateAngles(poseAngles);
+      // updateAngles expects a Record<string, number>; cast JointAngles accordingly
+      updateAngles(poseAngles as unknown as Record<string, number>);
 
       const now = Date.now();
       if (now - lastAngleUpdate.current > 200) {
@@ -325,38 +326,17 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
         lastCoachCall.current = now;
         // First try the AI API for richer feedback
         setCoachCallPending(true);
-        fetch("/api/coach", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            angles: poseAngles,
-            exercise: { name: EXERCISE_NAMES[exerciseIndex], targetAngles: EXERCISE_TARGETS[exerciseIndex] ?? EXERCISE_TARGETS[0] },
-            compensations: { lumbar: compensations.lumbar, shoulder: compensations.shoulder },
-          }),
-        })
-          .then((r) => r.json())
-          .then((data) => {
-            if (data.message) {
-              addCoachMessage({ id: `coach-${now}`, text: data.message, type: data.type || "info", timestamp: now });
-              speakCoachMessage(data.message);
-            }
-          })
-          .catch(() => {
-            // Fallback to dynamic local coaching if AI fails
-            const targets = EXERCISE_TARGETS[exerciseIndex] ?? EXERCISE_TARGETS[0];
-            const elapsed = (now - exerciseStartTimeRef.current) / 1000;
-            const dynamic = generateDynamicMessage(
-              poseAngles, prevAnglesRef.current, targets,
-              EXERCISE_NAMES[exerciseIndex], elapsed,
-              compensations
-            );
-            addCoachMessage({ id: `coach-${now}`, text: dynamic.text, type: dynamic.type, timestamp: now });
-            speakCoachMessage(dynamic.text);
-          })
-          .finally(() => {
-            setCoachCallPending(false);
-            prevAnglesRef.current = { ...poseAngles };
-          });
+        const targets = EXERCISE_TARGETS[exerciseIndex] ?? EXERCISE_TARGETS[0];
+        const elapsed = (now - exerciseStartTimeRef.current) / 1000;
+        const dynamic = generateDynamicMessage(
+          poseAngles, prevAnglesRef.current, targets,
+          EXERCISE_NAMES[exerciseIndex], elapsed,
+          compensations
+        );
+        addCoachMessage({ id: `coach-${now}`, text: dynamic.text, type: dynamic.type, timestamp: now });
+        speakCoachMessage(dynamic.text);
+        setCoachCallPending(false);
+        prevAnglesRef.current = { ...poseAngles };
       }
     },
     [exerciseIndex, updateAngles, addSignalPoint, setLumbarAlert, addCompensation, coachCallPending, compensations, addCoachMessage, speakCoachMessage, generateDynamicMessage]

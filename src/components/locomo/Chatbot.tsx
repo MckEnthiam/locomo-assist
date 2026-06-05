@@ -167,36 +167,9 @@ export function Chatbot() {
       let reply = "";
 
       try {
-        // Try API with an 8-second timeout (local fallback is reliable)
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000);
-
-        const res = await fetch("/api/chatbot", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            message: trimmed,
-            sessionId: sessionIdRef.current,
-          }),
-          signal: controller.signal,
-        });
-
-        clearTimeout(timeoutId);
-
-        if (res.ok) {
-          const data = await res.json();
-          reply = data.reply || getLocalFallback(trimmed);
-        } else {
-          reply = getLocalFallback(trimmed);
-        }
-      } catch (err: unknown) {
-        // Network error, timeout, or API failure — use local fallback
-        const isTimeout = err instanceof Error && err.name === "AbortError";
-        if (isTimeout) {
-          reply = getLocalFallback(trimmed);
-        } else {
-          reply = getLocalFallback(trimmed);
-        }
+        reply = getLocalFallback(trimmed);
+      } catch {
+        reply = "Je suis désolé, je ne peux pas répondre pour le moment.";
       }
 
       const botMsg: ChatMessage = {

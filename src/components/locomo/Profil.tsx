@@ -16,9 +16,9 @@ import {
   Edit3,
   Save,
   X,
-  Shield,
   Clock,
 } from "lucide-react";
+import { loadUser, saveUser } from "@/lib/localData";
 
 interface UserData {
   name: string;
@@ -55,13 +55,12 @@ export function Profil() {
     birthDate: DEFAULT_USER.birthDate || "",
     condition: DEFAULT_USER.condition || "",
   });
-  const [newPassword, setNewPassword] = useState("");
 
   // Load user from localStorage on mount
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem("locomo-user");
-      if (stored) {
+    const stored = localStorage.getItem("locomo-user");
+    if (stored) {
+      try {
         const parsed = JSON.parse(stored) as UserData;
         setUser(parsed);
         setForm({
@@ -70,38 +69,37 @@ export function Profil() {
           birthDate: parsed.birthDate || "",
           condition: parsed.condition || "",
         });
+        return;
+      } catch {
+        // fall back to default user
       }
-    } catch {
-      // use defaults
     }
+    const defaultUser = loadUser();
+    setUser(defaultUser);
+    setForm({
+      name: defaultUser.name,
+      phone: defaultUser.phone || "",
+      birthDate: defaultUser.birthDate || "",
+      condition: defaultUser.condition || "",
+    });
   }, []);
 
   async function handleSave() {
     setLoading(true);
     setSuccess("");
     try {
-      const payload: Record<string, string> = {
+      const updated: UserData = {
+        ...user,
         name: form.name,
         phone: form.phone,
         birthDate: form.birthDate,
         condition: form.condition,
       };
-      if (newPassword) payload.password = newPassword;
-      const res = await fetch("/api/auth/profile", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (res.ok) {
-        const updated = await res.json();
-        setUser(updated);
-        // Update localStorage
-        localStorage.setItem("locomo-user", JSON.stringify(updated));
-        setEditing(false);
-        setNewPassword("");
-        setSuccess("Profil mis \u00e0 jour avec succ\u00e8s !");
-        setTimeout(() => setSuccess(""), 3000);
-      }
+      setUser(updated);
+      saveUser(updated);
+      setEditing(false);
+      setSuccess("Profil mis à jour avec succès !");
+      setTimeout(() => setSuccess(""), 3000);
     } catch {
       // silent
     }
@@ -296,24 +294,6 @@ export function Profil() {
               />
             </div>
           </div>
-          {editing && (
-            <div className="mt-4">
-              <Label className="text-xs">
-                Nouveau mot de passe (laisser vide pour ne pas changer)
-              </Label>
-              <div className="relative mt-1">
-                <Shield className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  className="pl-9 h-10"
-                  placeholder="Nouveau mot de passe"
-                  minLength={6}
-                />
-              </div>
-            </div>
-          )}
         </CardContent>
       </Card>
     </div>

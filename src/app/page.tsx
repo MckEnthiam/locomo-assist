@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { Sidebar } from "@/components/locomo/Sidebar";
 import { Dashboard } from "@/components/locomo/Dashboard";
@@ -14,6 +13,7 @@ import { Apropos } from "@/components/locomo/Apropos";
 import { Parametres } from "@/components/locomo/Parametres";
 import { Chatbot } from "@/components/locomo/Chatbot";
 import { useSessionStore } from "@/store/sessionStore";
+import { getDashboardData } from "@/lib/localData";
 
 interface UserInfo {
   id: string;
@@ -140,7 +140,6 @@ function createDemoUser(): UserInfo {
 
 /* ─── Main App ─── */
 export default function Home() {
-  const router = useRouter();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [dashboardData, setDashboardData] = useState<Record<string, unknown> | null>(null);
@@ -154,28 +153,21 @@ export default function Home() {
 
   // Check authentication on mount — auto-login as demo patient if needed
   useEffect(() => {
-    const auth = localStorage.getItem("locomo-auth");
     const storedUser = localStorage.getItem("locomo-user");
-
-    if (auth === "true" && storedUser) {
+    if (storedUser) {
       try {
         setUser(JSON.parse(storedUser));
       } catch {
-        // Invalid stored data — fall through to auto-login
         const demoUser = createDemoUser();
         localStorage.setItem("locomo-user", JSON.stringify(demoUser));
-        localStorage.setItem("locomo-auth", "true");
         setUser(demoUser);
       }
     } else {
-      // Auto-login as demo patient — go directly to dashboard
       const demoUser = createDemoUser();
       localStorage.setItem("locomo-user", JSON.stringify(demoUser));
-      localStorage.setItem("locomo-auth", "true");
       setUser(demoUser);
     }
 
-    // Initialize dark mode preference
     const darkPref = localStorage.getItem("locomo-dark");
     if (darkPref === "true") {
       document.documentElement.classList.add("dark");
@@ -217,44 +209,14 @@ export default function Home() {
     dayType: "Epaule et Hanche",
   };
 
-  // Load dashboard data
+  // Load dashboard data from browser storage
   useEffect(() => {
     if (!user || !splashDoneRef.current) return;
-    async function loadDashboard() {
-      setDashboardLoading(true);
-      try {
-        const res = await fetch("/api/sessions?scope=dashboard");
-        if (res.ok) {
-          const json = await res.json();
-          setDashboardData(json);
-        } else {
-          setDashboardData(FALLBACK_DATA);
-        }
-      } catch {
-        setDashboardData(FALLBACK_DATA);
-      }
-      setDashboardLoading(false);
-    }
-    void loadDashboard();
-  }, [activeTab, isLive, user]);
 
-  // Refresh dashboard when session ends
-  useEffect(() => {
-    if (!user || !splashDoneRef.current) return;
-    if (!isLive && activeTab === "dashboard") {
-      async function loadDashboard() {
-        try {
-          const res = await fetch("/api/sessions?scope=dashboard");
-          if (res.ok) {
-            setDashboardData(await res.json());
-          }
-        } catch {
-          /* silent */
-        }
-      }
-      void loadDashboard();
-    }
-  }, [isLive, activeTab, user]);
+    setDashboardLoading(true);
+    setDashboardData(getDashboardData());
+    setDashboardLoading(false);
+  }, [activeTab, isLive, user, splashDone]);
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { getReports, generateReportFromLatestSession } from "@/lib/localData";
 import {
   FileText,
   Download,
@@ -568,18 +569,10 @@ export function Rapports() {
   } | null>(null);
   const [previewReport, setPreviewReport] = useState<ReportItem | null>(null);
 
-  const loadReports = useCallback(async () => {
-    try {
-      const res = await fetch("/api/rapports");
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) {
-          setReports(data);
-        }
-        // If API returns empty data or error, keep FALLBACK_REPORTS silently
-      }
-    } catch {
-      // Keep fallback reports, no error shown to user
+  const loadReports = useCallback(() => {
+    const data = getReports();
+    if (Array.isArray(data) && data.length > 0) {
+      setReports(data);
     }
     setLoading(false);
   }, []);
@@ -592,26 +585,18 @@ export function Rapports() {
     setGenerating(true);
     setStatusMessage(null);
     try {
-      const res = await fetch("/api/rapports", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
+      const report = generateReportFromLatestSession();
+      if (!report) {
         setStatusMessage({
-          text: data.error || "Erreur lors de la génération du rapport",
+          text: "Aucune session disponible pour générer un rapport.",
           type: "error",
         });
-      } else if (data.error) {
-        setStatusMessage({ text: data.error, type: "error" });
       } else {
         setStatusMessage({
-          text: "Rapport généré avec succès ! Vous pouvez le prévisualiser ou le télécharger.",
+          text: "Rapport généré avec succès ! Vous pouvez le prévisualiser ou le télécharger.",
           type: "success",
         });
-        await loadReports();
+        loadReports();
       }
     } catch {
       setStatusMessage({
