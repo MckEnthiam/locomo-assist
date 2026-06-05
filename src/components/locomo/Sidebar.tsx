@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
@@ -31,7 +31,6 @@ export function Sidebar({
   onTabChange,
 }: SidebarProps) {
   const [previewKey, setPreviewKey] = useState<string | undefined>(undefined);
-  const [imageLoaded, setImageLoaded] = useState(true);
   const currentPreview = previewKey ?? activeTab;
   let previewImage = "";
   if (currentPreview === "dashboard") {
@@ -49,10 +48,6 @@ export function Sidebar({
   } else {
     previewImage = `${currentPreview}.png`;
   }
-
-  useEffect(() => {
-    setImageLoaded(false);
-  }, [previewImage]);
 
   return (
     <aside className="flex w-72 shrink-0 flex-col bg-white border-r border-slate-200/80 shadow-sm h-screen overflow-y-auto">
@@ -101,8 +96,7 @@ export function Sidebar({
           <img
             src={`/memphis-assets/${previewImage}`}
             alt={currentPreview}
-            className={`w-full h-full object-cover transition-opacity duration-500 ease-out ${imageLoaded ? "opacity-100" : "opacity-0"}`}
-            onLoad={() => setImageLoaded(true)}
+            className="w-full h-full object-cover"
             onError={(e) => {
               const t = e.target as HTMLImageElement;
               if (t && t.src.indexOf("/logo.png") === -1) t.src = "/logo.png";
