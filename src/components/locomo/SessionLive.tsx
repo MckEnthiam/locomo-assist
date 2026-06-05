@@ -517,56 +517,76 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
 
   // === CONDITIONAL RETURNS AFTER ALL HOOKS ===
 
-  // Not started view
+  // Not started view — with Memphis-style decorative background
   if (!isLive) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
-        <div className="relative">
-          <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center p-2">
-            <img src="/logo.png" alt="Locomo-assist" className="w-16 h-16 object-contain" />
-          </div>
-          <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-primary animate-pulse flex items-center justify-center">
-            <Mic className="w-3 h-3 text-white" />
-          </div>
+      <div className="relative w-full">
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {/* Large soft blob */}
+          <svg className="absolute -left-16 -top-10 w-72 h-72 opacity-20" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#7C3AED" />
+                <stop offset="100%" stopColor="#06B6D4" />
+              </linearGradient>
+            </defs>
+            <path fill="url(#g1)" d="M43.8,-63.8C57.8,-54.6,69.2,-43.9,74.8,-30.9C80.4,-17.9,80.2,-2.7,76.6,11.4C72.9,25.5,65.8,38.7,55.4,49.3C44.9,59.9,31.9,67.9,17.8,71.8C3.7,75.6,-11.6,75.3,-25.9,69.1C-40.3,62.8,-53.7,50.6,-61.4,35.9C-69.1,21.2,-71.2,4,-67.9,-11.6C-64.6,-27.2,-56,-41.4,-43.6,-51.8C-31.3,-62.2,-15.7,-68.8,-0.4,-68.4C14.9,-68,29.8,-60.9,43.8,-63.8Z" transform="translate(100 100)" />
+          </svg>
+          {/* Small circles */}
+          <svg className="absolute right-6 bottom-6 w-36 h-36 opacity-15" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="20" cy="30" r="18" fill="#F97316" />
+            <circle cx="60" cy="60" r="10" fill="#22C55E" />
+          </svg>
         </div>
-        <div className="text-center">
-          <h2 className="text-xl font-bold">Session en direct</h2>
-          <p className="text-sm text-muted-foreground mt-2 max-w-md">
-            Lancez votre session de rééducation. Activez votre caméra pour que
-            l&apos;IA analyse vos mouvements en temps réel et vous coach
-            exercice par exercice.
-          </p>
-        </div>
-        <div className="w-full max-w-2xl">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <div className="flex items-center gap-3">
-              <Button variant={useCamera ? "default" : "outline"} size="sm" onClick={() => setUseCamera(!useCamera)} className={useCamera ? "bg-primary hover:bg-primary/90" : ""}>
-                <Camera className="w-4 h-4 mr-2" />
-                Caméra {useCamera ? "activée" : "désactivée"}
-              </Button>
-            </div>
 
-            <div className="flex-1">
-              <p className="text-sm font-medium mb-2">Choisir l'exercice</p>
-              <div className="flex gap-2 flex-wrap">
-                {EXERCISE_NAMES.map((n, i) => (
-                  <Button key={n} variant={i === selectedExerciseIndex ? "default" : "outline"} size="sm" onClick={() => setSelectedExerciseIndex(i)}>
-                    {n}
-                  </Button>
-                ))}
+        <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6 relative z-10">
+          <div className="relative">
+            <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center p-2">
+              <img src="/logo.png" alt="Locomo-assist" className="w-16 h-16 object-contain" />
+            </div>
+            <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-primary animate-pulse flex items-center justify-center">
+              <Mic className="w-3 h-3 text-white" />
+            </div>
+          </div>
+          <div className="text-center">
+            <h2 className="text-xl font-bold">Session en direct</h2>
+            <p className="text-sm text-muted-foreground mt-2 max-w-md">
+              Lancez votre session de rééducation. Activez votre caméra pour que
+              l&apos;IA analyse vos mouvements en temps réel et vous coach
+              exercice par exercice.
+            </p>
+          </div>
+          <div className="w-full max-w-2xl">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div className="flex items-center gap-3">
+                <Button variant={useCamera ? "default" : "outline"} size="sm" onClick={() => setUseCamera(!useCamera)} className={useCamera ? "bg-primary hover:bg-primary/90" : ""}>
+                  <Camera className="w-4 h-4 mr-2" />
+                  Caméra {useCamera ? "activée" : "désactivée"}
+                </Button>
+              </div>
+
+              <div className="flex-1">
+                <p className="text-sm font-medium mb-2">Choisir l'exercice</p>
+                <div className="flex gap-2 flex-wrap">
+                  {EXERCISE_NAMES.map((n, i) => (
+                    <Button key={n} variant={i === selectedExerciseIndex ? "default" : "outline"} size="sm" onClick={() => setSelectedExerciseIndex(i)}>
+                      {n}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="w-48">
+                <p className="text-sm font-medium mb-2">Durée: {selectedDuration} min</p>
+                <Slider value={[selectedDuration]} min={1} max={30} onValueChange={(v: number[]) => setSelectedDuration(v[0])} />
               </div>
             </div>
-
-            <div className="w-48">
-              <p className="text-sm font-medium mb-2">Durée: {selectedDuration} min</p>
-              <Slider value={[selectedDuration]} min={1} max={30} onValueChange={(v: number[]) => setSelectedDuration(v[0])} />
+            <div className="mt-4 flex justify-center">
+              <Button onClick={handleToggle} size="lg" className="bg-primary hover:bg-primary/90 shadow-md px-8">
+                <Play className="w-5 h-5 mr-2" />
+                Démarrer la session
+              </Button>
             </div>
-          </div>
-          <div className="mt-4 flex justify-center">
-            <Button onClick={handleToggle} size="lg" className="bg-primary hover:bg-primary/90 shadow-md px-8">
-              <Play className="w-5 h-5 mr-2" />
-              Démarrer la session
-            </Button>
           </div>
         </div>
       </div>
@@ -600,7 +620,10 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
       </div>
 
       {/* Active exercise info (single-exercise mode) */}
-      <div className="p-3 rounded-xl bg-white shadow-sm">
+      <div className="p-3 rounded-xl bg-white shadow-sm relative overflow-hidden">
+        <svg className="absolute -right-10 -top-6 w-36 h-36 opacity-15 pointer-events-none" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <rect x="10" y="10" width="60" height="60" rx="12" fill="#E9D5FF" transform="rotate(18 50 50)" />
+        </svg>
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs text-muted-foreground">Exercice actif</p>
@@ -617,6 +640,10 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
           <Card className="border-0 shadow-sm overflow-hidden">
             <CardContent className="p-0 relative bg-white">
               <div className="absolute left-6 top-6 w-[320px] h-48 rounded-3xl border border-white/10 bg-slate-950/90 overflow-hidden shadow-2xl shadow-slate-950/20">
+                {/* Memphis accents behind camera preview */}
+                <svg className="absolute -left-10 -top-8 w-40 h-40 opacity-20 pointer-events-none" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="20" cy="20" r="24" fill="#FDE68A" />
+                </svg>
                 {useCamera ? (
                   <CameraView active={isLive} onAngles={handleCameraAngles} />
                 ) : (
@@ -659,9 +686,9 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
 
         {/* Right Panel */}
         <aside className="space-y-4">
-          <Card className="border-0 shadow-sm">
+          <Card className="border-0 shadow-sm relative overflow-hidden">
             <CardContent className="p-4">
-              <p className="text-xs font-semibold text-muted-foreground mb-3">
+                  <p className="text-xs font-semibold text-muted-foreground mb-3">
                 {useCamera ? "Angles articulaires (détection IA)" : "Angles articulaires (simulation)"}
               </p>
               <div className="space-y-3">
@@ -687,8 +714,11 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-sm">
-            <CardContent className="p-4">
+          <Card className="border-0 shadow-sm relative">
+            <svg className="absolute left-4 top-4 w-20 h-20 opacity-10 pointer-events-none" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="18" cy="18" r="14" fill="#BFDBFE" />
+            </svg>
+            <CardContent className="p-4 relative">
               <p className="text-xs font-semibold text-muted-foreground mb-3 flex items-center gap-1.5">
                 <Mic className="w-3.5 h-3.5 text-primary" />
                 Coach IA {coachCallPending && <span className="text-[10px] text-primary animate-pulse">...analyse</span>}
