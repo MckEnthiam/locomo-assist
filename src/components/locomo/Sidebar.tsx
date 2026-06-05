@@ -20,15 +20,11 @@ const links = [
 interface SidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
-  userName?: string;
-  userEmail?: string;
 }
 
 export function Sidebar({
   activeTab,
   onTabChange,
-  userName = "Patient Démo",
-  userEmail = "demo@locomo.com",
 }: SidebarProps) {
   return (
     <aside className="flex w-72 shrink-0 flex-col bg-white border-r border-slate-200/80 shadow-sm h-screen overflow-y-auto">
@@ -40,22 +36,7 @@ export function Sidebar({
             className="w-11 h-11 rounded-2xl object-contain border border-slate-200/80"
           />
           <div>
-            <h1 className="text-base font-semibold text-slate-900">locomo assist</h1>
-            <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500 mt-1">
-              Coaching physique
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="p-6 space-y-4 border-b border-slate-200/80">
-        <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 font-semibold">
-            {userName.charAt(0).toUpperCase()}
-          </div>
-          <div className="min-w-0">
-            <p className="text-sm font-semibold text-slate-900 truncate">{userName}</p>
-            <p className="text-[11px] text-slate-500 truncate">{userEmail}</p>
+            <h1 className="text-2xl font-bold text-slate-900">locomo assist</h1>
           </div>
         </div>
       </div>
