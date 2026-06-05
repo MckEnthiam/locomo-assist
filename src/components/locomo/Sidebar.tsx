@@ -1,5 +1,3 @@
-"use client";
-
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
@@ -12,12 +10,11 @@ import {
   Info,
   Moon,
   LogOut,
-  Shield,
   MessageCircle,
 } from "lucide-react";
 
 const links = [
-  { key: "dashboard", label: "Tableau de bord", icon: LayoutDashboard },
+  { key: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { key: "planning", label: "Planning", icon: CalendarDays },
   { key: "session", label: "Session live", icon: Activity },
   { key: "progression", label: "Progression", icon: TrendingUp },
@@ -27,8 +24,8 @@ const links = [
 
 const secondaryLinks = [
   { key: "profil", label: "Profil", icon: User },
-  { key: "parametres", label: "Param\u00e8tres", icon: Settings },
-  { key: "apropos", label: "\u00c0 propos", icon: Info },
+  { key: "parametres", label: "Paramètres", icon: Settings },
+  { key: "apropos", label: "À propos", icon: Info },
 ];
 
 interface SidebarProps {
@@ -43,7 +40,7 @@ interface SidebarProps {
 export function Sidebar({
   activeTab,
   onTabChange,
-  userName = "Patient D\u00e9mo",
+  userName = "Patient Démo",
   userEmail = "demo@locomo.com",
   userRole = "PATIENT",
   onLogout,
@@ -55,44 +52,38 @@ export function Sidebar({
   }
 
   return (
-    <aside className="flex w-64 shrink-0 flex-col bg-sidebar text-sidebar-foreground h-screen overflow-y-auto">
-      {/* Logo */}
-      <div className="flex items-center gap-3 px-5 py-5 border-b border-sidebar-border">
-        <img
-          src="/logo.png"
-          alt="Locomo-assist"
-          className="w-10 h-10 rounded-lg object-contain shadow-md"
-        />
-        <div>
-          <h1 className="text-base font-bold tracking-tight text-white">
-            Locomo-assist
-          </h1>
-          <p className="text-[10px] text-white/50 tracking-wide uppercase">
-            R&#233;&#233;ducation IA
-          </p>
-        </div>
-      </div>
-
-      {/* User Profile Section */}
-      <div className="px-4 py-3 border-b border-sidebar-border">
+    <aside className="flex w-72 shrink-0 flex-col bg-white border-r border-slate-200/80 shadow-sm h-screen overflow-y-auto">
+      <div className="p-6 border-b border-slate-200/80">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
-            <span className="text-sm font-bold text-white">
-              {userName.charAt(0).toUpperCase()}
-            </span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-white truncate">{userName}</p>
-            <p className="text-[10px] text-sidebar-foreground/50 truncate">
-              {userEmail}
+          <img
+            src="/logo.png"
+            alt="Locomo-assist"
+            className="w-11 h-11 rounded-2xl object-contain border border-slate-200/80"
+          />
+          <div>
+            <h1 className="text-base font-semibold text-slate-900">Locomo-assist</h1>
+            <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500 mt-1">
+              Coaching physique
             </p>
           </div>
         </div>
       </div>
 
-      {/* Navigation - Main */}
-      <nav className="flex-1 flex flex-col gap-1 p-3 mt-2">
-        <p className="text-[10px] font-semibold text-sidebar-foreground/40 uppercase tracking-wider px-3 mb-1">
+      <div className="p-6 space-y-4 border-b border-slate-200/80">
+        <div className="flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 font-semibold">
+            {userName.charAt(0).toUpperCase()}
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-slate-900 truncate">{userName}</p>
+            <p className="text-[11px] text-slate-500 truncate">{userEmail}</p>
+          </div>
+        </div>
+        <p className="text-[11px] text-slate-500 leading-5">{userRole === "THERAPIST" ? "Thérapeute" : "Patient"}</p>
+      </div>
+
+      <nav className="flex-1 px-3 py-4 space-y-1">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-slate-400 px-3 mb-2">
           Navigation
         </p>
         {links.map(({ key, label, icon: Icon }) => {
@@ -102,43 +93,19 @@ export function Sidebar({
               key={key}
               onClick={() => onTabChange(key)}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-200 w-full text-left",
+                "flex w-full items-center gap-3 rounded-3xl px-4 py-3 text-left text-sm transition-all duration-200",
                 active
-                  ? "bg-primary text-white shadow-lg shadow-primary/30 font-medium"
-                  : "text-sidebar-foreground/70 hover:text-white hover:bg-white/10"
+                  ? "bg-indigo-600 text-white shadow-sm"
+                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
               )}
             >
-              <Icon
-                className="w-4.5 h-4.5"
-                strokeWidth={active ? 2.2 : 1.5}
-              />
-              {label}
-              {key === "session" && (
-                <span
-                  className={cn(
-                    "ml-auto w-2 h-2 rounded-full",
-                    active
-                      ? "bg-white animate-pulse"
-                      : "bg-primary animate-pulse"
-                  )}
-                />
-              )}
-              {key === "chatbot" && (
-                <span
-                  className={cn(
-                    "ml-auto w-2 h-2 rounded-full",
-                    active
-                      ? "bg-white"
-                      : "bg-green-400 animate-pulse"
-                  )}
-                />
-              )}
+              <Icon className="w-5 h-5" />
+              <span>{label}</span>
             </button>
           );
         })}
 
-        {/* Secondary */}
-        <p className="text-[10px] font-semibold text-sidebar-foreground/40 uppercase tracking-wider px-3 mt-5 mb-1">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-slate-400 px-3 mt-6 mb-2">
           Compte
         </p>
         {secondaryLinks.map(({ key, label, icon: Icon }) => {
@@ -148,49 +115,45 @@ export function Sidebar({
               key={key}
               onClick={() => onTabChange(key)}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-200 w-full text-left",
+                "flex w-full items-center gap-3 rounded-3xl px-4 py-3 text-left text-sm transition-all duration-200",
                 active
-                  ? "bg-white/15 text-white font-medium"
-                  : "text-sidebar-foreground/50 hover:text-white hover:bg-white/10"
+                  ? "bg-slate-100 text-slate-900"
+                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
               )}
             >
-              <Icon className="w-4 h-4" strokeWidth={active ? 2 : 1.5} />
-              {label}
+              <Icon className="w-5 h-5" />
+              <span>{label}</span>
             </button>
           );
         })}
       </nav>
 
-      {/* Bottom actions */}
-      <div className="p-3 space-y-2">
-        {/* Dark mode toggle */}
+      <div className="px-6 pb-6 pt-4 space-y-3">
         <button
+          type="button"
           onClick={toggleDarkMode}
-          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm w-full text-left text-sidebar-foreground/50 hover:text-white hover:bg-white/10 transition-all"
+          className="flex w-full items-center gap-3 rounded-3xl border border-slate-200/80 bg-slate-50 px-4 py-3 text-sm text-slate-700 hover:bg-slate-100 transition"
         >
-          <Moon className="w-4 h-4" />
-          <span>Mode sombre</span>
+          <Moon className="w-5 h-5" />
+          Mode sombre
         </button>
 
-        {/* Logout */}
         {onLogout && (
           <button
+            type="button"
             onClick={onLogout}
-            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm w-full text-left text-red-300 hover:text-white hover:bg-red-500/20 transition-all"
+            className="flex w-full items-center gap-3 rounded-3xl bg-red-50 px-4 py-3 text-sm text-red-600 hover:bg-red-100 transition"
           >
-            <LogOut className="w-4 h-4" />
-            <span>Deconnexion</span>
+            <LogOut className="w-5 h-5" />
+            Déconnexion
           </button>
         )}
 
-        {/* Hackathon Badge */}
-        <div className="rounded-lg bg-white/10 backdrop-blur-sm p-3 text-center mt-2">
-          <p className="text-[10px] font-semibold text-primary tracking-wider uppercase">
+        <div className="rounded-3xl border border-slate-200/80 bg-slate-50 p-4 text-center">
+          <p className="text-[10px] uppercase tracking-[0.28em] text-slate-400">
             TCCHackDefend 2026
           </p>
-          <p className="text-[9px] text-sidebar-foreground/40 mt-1">
-            Hackathon Project
-          </p>
+          <p className="text-[11px] text-slate-500 mt-1">Prototype</p>
         </div>
       </div>
     </aside>

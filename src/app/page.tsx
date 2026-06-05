@@ -315,8 +315,8 @@ export default function Home() {
   // Step 2: Not authenticated — should not happen (auto-login), but guard anyway
   if (!user) {
     return (
-      <div className="flex h-screen items-center justify-center bg-[#F0F5F2]">
-        <div className="w-8 h-8 rounded-full border-2 border-[#1D9E75] border-t-transparent animate-spin" style={{ borderTopColor: "transparent" }} />
+      <div className="flex h-screen items-center justify-center bg-[#EFF2F8]">
+        <div className="w-8 h-8 rounded-full border-2 border-[#5661F2] border-t-transparent animate-spin" style={{ borderTopColor: "transparent" }} />
       </div>
     );
   }
@@ -328,7 +328,7 @@ export default function Home() {
 
   // Step 4: Authenticated and splash done — show the app
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex bg-[#EFF2F8]">
       {/* Desktop Sidebar */}
       <div className="hidden md:block md:sticky md:top-0 md:h-screen">
         <Sidebar
@@ -362,9 +362,9 @@ export default function Home() {
       )}
 
       {/* Main Content */}
-      <main className="flex-1">
+      <main className="flex-1 bg-[#EFF2F8]">
         {/* Mobile Header */}
-        <header className="md:hidden sticky top-0 z-20 bg-background/80 backdrop-blur-md border-b border-border px-4 py-3">
+        <header className="md:hidden sticky top-0 z-20 bg-white/95 border-b border-slate-200/80 px-4 py-3">
           <div className="flex items-center justify-between">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -385,7 +385,7 @@ export default function Home() {
         </header>
 
         {/* Page Content */}
-        <div className="p-4 md:p-6 lg:p-8">{renderContent()}</div>
+        <div className="mx-auto w-full max-w-[1600px] p-4 md:p-6 lg:p-8">{renderContent()}</div>
       </main>
 
       {/* Global Chatbot */}
