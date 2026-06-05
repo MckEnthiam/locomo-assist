@@ -11,6 +11,7 @@ import {
 } from "recharts";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
 import {
   Activity,
   AlertTriangle,
@@ -31,19 +32,15 @@ import { CameraView } from "./CameraView";
 import type { JointAngles } from "@/lib/poseAngles";
 
 const EXERCISE_NAMES = [
-  "Flexion avant épaule",
-  "Rotation externe épaule",
-  "Abduction latérale",
-  "Pendule Codman",
-  "Mobilisation hanche",
+  "Élévation latérale du bras",
+  "Abduction du bras",
+  "Flexion du coude",
 ];
 
 const EXERCISE_TARGETS: JointAngles[] = [
-  { shoulderLeft: 120, shoulderRight: 120, elbowLeft: 170, elbowRight: 170, spine: 10, hip: 175 },
-  { shoulderLeft: 90, shoulderRight: 90, elbowLeft: 90, elbowRight: 90, spine: 8, hip: 175 },
   { shoulderLeft: 90, shoulderRight: 90, elbowLeft: 175, elbowRight: 175, spine: 12, hip: 175 },
-  { shoulderLeft: 45, shoulderRight: 45, elbowLeft: 160, elbowRight: 160, spine: 25, hip: 170 },
-  { shoulderLeft: 15, shoulderRight: 15, elbowLeft: 170, elbowRight: 170, spine: 10, hip: 45 },
+  { shoulderLeft: 90, shoulderRight: 90, elbowLeft: 175, elbowRight: 175, spine: 12, hip: 175 },
+  { shoulderLeft: 45, shoulderRight: 45, elbowLeft: 60, elbowRight: 60, spine: 15, hip: 175 },
 ];
 
 interface SessionLiveProps {
@@ -76,6 +73,11 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
   const [useCamera, setUseCamera] = useState(true);
   const [coachCallPending, setCoachCallPending] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(true);
+  // selected exercise (index into EXERCISE_NAMES) and duration in minutes
+  const [selectedExerciseIndex, setSelectedExerciseIndex] = useState(0);
+  const [selectedDuration, setSelectedDuration] = useState(1);
+  const [activeExerciseIndex, setActiveExerciseIndex] = useState(0);
+  const [sessionDuration, setSessionDuration] = useState(1);
   const lastCoachCall = useRef(0);
   const lastAngleUpdate = useRef(0);
   const lastSpokenRef = useRef("");
@@ -87,6 +89,9 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
   const prevStepRef = useRef(-1);
   const sessionStartTimeRef = useRef(0);
   const lastTimeTipRef = useRef(0);
+
+  const selectedExerciseName = EXERCISE_NAMES[selectedExerciseIndex];
+  const exerciseIndex = isLive ? activeExerciseIndex : selectedExerciseIndex;
 
   // Text-to-Speech helper — speaks coach messages aloud using Web Speech API
   const speakCoachMessage = useCallback((text: string) => {
@@ -124,42 +129,25 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
 
   // Exercise intro messages for each exercise
   const EXERCISE_INTROS: string[] = [
-    "Bienvenue ! Commencez par l'exercice 1 : Flexion avant épaule. Effectuez 3 séries de 12 répétitions. Gardez le dos droit et les épaules détendues. Levez le bras lentement devant vous jusqu'à l'horizontale.",
-    "Exercice 2 : Rotation externe épaule. 3 séries de 15 répétitions. Gardez le coude collé au corps et tournez l'avant-bras vers l'extérieur. Mouvement lent et contrôlé.",
-    "Exercice 3 : Abduction latérale. 3 séries de 10 répétitions. Levez le bras sur le côté jusqu'à l'horizontale. Ne montez pas plus haut que l'épaule pour éviter les compensations.",
-    "Exercice 4 : Pendule Codman. 2 séries de 20 répétitions. Laissez votre bras pendre détendu et faites de petits cercles. C'est un exercice doux, pas besoin de forcer.",
-    "Exercice 5 : Mobilisation hanche. 3 séries de 12 répétitions. Allongé sur le dos, ramenez le genou vers la poitrine. Gardez la colonne bien plaquée au sol.",
+    "Bienvenue ! Commencez l'exercice : Élévation latérale du bras. Levez le bras latéralement jusqu'à l'horizontale, en gardant l'épaule stable. Faites chaque mouvement lentement et contrôlé.",
+    "Bienvenue ! Commencez l'exercice : Abduction du bras. Écartez le bras sur le côté en gardant le coude légèrement fléchi. Ne montez pas plus haut que l'épaule.",
+    "Bienvenue ! Commencez l'exercice : Flexion du coude. Pliez le coude en gardant le bras près du corps et contrôlez la montée et la descente.",
   ];
 
   // Reset coaching state when exercise changes + add transition messages
   useEffect(() => {
     if (!isLive) return;
     const now = Date.now();
-    // Add exercise intro or transition message
-    if (prevStepRef.current === -1) {
-      // Session just started — welcome message
-      const welcomeMsg = EXERCISE_INTROS[currentStep] || `Exercice : ${EXERCISE_NAMES[currentStep]}. Suivez les consignes à l'écran.`;
-      addCoachMessage({ id: `intro-${now}`, text: welcomeMsg, type: "info", timestamp: now });
-      speakCoachMessage(welcomeMsg);
-    } else if (currentStep !== prevStepRef.current) {
-      // Exercise transition
-      const restMsg = "Petite pause de 10 secondes entre les exercices. Respirez profondément et préparez-vous pour le suivant.";
-      addCoachMessage({ id: `rest-${now}`, text: restMsg, type: "info", timestamp: now });
-      speakCoachMessage(restMsg);
-      // Then after a short delay, introduce the new exercise
-      const introMsg = EXERCISE_INTROS[currentStep] || `Passons à : ${EXERCISE_NAMES[currentStep]}. Suivez les indications.`;
-      setTimeout(() => {
-        const introNow = Date.now();
-        addCoachMessage({ id: `intro-${introNow}`, text: introMsg, type: "info", timestamp: introNow });
-        speakCoachMessage(introMsg);
-      }, 2000);
-    }
-    prevStepRef.current = currentStep;
+    // Session just started — welcome message for the selected exercise
+    const welcomeMsg = EXERCISE_INTROS[exerciseIndex] || `Exercice : ${EXERCISE_NAMES[exerciseIndex]}. Suivez les consignes à l'écran.`;
+    addCoachMessage({ id: `intro-${now}`, text: welcomeMsg, type: "info", timestamp: now });
+    speakCoachMessage(welcomeMsg);
+    prevStepRef.current = exerciseIndex;
     prevAnglesRef.current = {};
     consecutiveGoodRef.current = 0;
     exerciseStartTimeRef.current = now;
     lastCompensationSpokenRef.current = 0;
-  }, [currentStep, isLive, addCoachMessage, speakCoachMessage]);
+  }, [exerciseIndex, isLive, addCoachMessage, speakCoachMessage]);
 
   // Generate a dynamic, unique coaching message based on real-time data
   const generateDynamicMessage = useCallback((
@@ -311,7 +299,7 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
       const now = Date.now();
       if (now - lastAngleUpdate.current > 200) {
         lastAngleUpdate.current = now;
-        const shoulderTarget = EXERCISE_TARGETS[currentStep]?.shoulderLeft ?? 90;
+        const shoulderTarget = EXERCISE_TARGETS[exerciseIndex]?.shoulderLeft ?? 90;
         const shoulderSignal =
           ((poseAngles.shoulderLeft - shoulderTarget * 0.3) / Math.max(30, shoulderTarget * 0.7)) * 500;
         const spineSignal = ((poseAngles.spine - 10) / 20) * 500;
@@ -342,7 +330,7 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             angles: poseAngles,
-            exercise: { name: EXERCISE_NAMES[currentStep], targetAngles: EXERCISE_TARGETS[currentStep] ?? EXERCISE_TARGETS[0] },
+            exercise: { name: EXERCISE_NAMES[exerciseIndex], targetAngles: EXERCISE_TARGETS[exerciseIndex] ?? EXERCISE_TARGETS[0] },
             compensations: { lumbar: compensations.lumbar, shoulder: compensations.shoulder },
           }),
         })
@@ -355,11 +343,11 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
           })
           .catch(() => {
             // Fallback to dynamic local coaching if AI fails
-            const targets = EXERCISE_TARGETS[currentStep] ?? EXERCISE_TARGETS[0];
+            const targets = EXERCISE_TARGETS[exerciseIndex] ?? EXERCISE_TARGETS[0];
             const elapsed = (now - exerciseStartTimeRef.current) / 1000;
             const dynamic = generateDynamicMessage(
               poseAngles, prevAnglesRef.current, targets,
-              EXERCISE_NAMES[currentStep], elapsed,
+              EXERCISE_NAMES[exerciseIndex], elapsed,
               compensations
             );
             addCoachMessage({ id: `coach-${now}`, text: dynamic.text, type: dynamic.type, timestamp: now });
@@ -371,7 +359,7 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
           });
       }
     },
-    [currentStep, updateAngles, addSignalPoint, setLumbarAlert, addCompensation, coachCallPending, compensations, addCoachMessage, speakCoachMessage, generateDynamicMessage]
+    [exerciseIndex, updateAngles, addSignalPoint, setLumbarAlert, addCompensation, coachCallPending, compensations, addCoachMessage, speakCoachMessage, generateDynamicMessage]
   );
 
   // Timer + session start tracking + periodic time-based tips
@@ -411,7 +399,7 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
   // Demo mode simulation (when camera is OFF) — with realistic angle variation
   useEffect(() => {
     if (!isLive || useCamera) return;
-    const targets = EXERCISE_TARGETS[currentStep] ?? EXERCISE_TARGETS[0];
+    const targets = EXERCISE_TARGETS[exerciseIndex] ?? EXERCISE_TARGETS[0];
     // Simulate a realistic session: start bad, improve,偶尔 have bad moments
     const phaseRef = { value: 0 }; // 0=improving, 1=good, 2=slipping
     const phaseStart = { value: Date.now() };
@@ -445,18 +433,18 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
       if (Math.abs((newAngles.shoulderLeft ?? 0) - shoulderTarget) > 20 && Math.random() < 0.2) addCompensation("shoulder");
     }, 200);
     return () => clearInterval(interval);
-  }, [isLive, useCamera, currentStep, updateAngles, addSignalPoint, setLumbarAlert, addCompensation]);
+  }, [isLive, useCamera, exerciseIndex, updateAngles, addSignalPoint, setLumbarAlert, addCompensation]);
 
   // Demo dynamic coaching (when camera is OFF) — uses the same smart engine
   useEffect(() => {
     if (!isLive || useCamera) return;
     const interval = setInterval(() => {
       const now = Date.now();
-      const targets = EXERCISE_TARGETS[currentStep] ?? EXERCISE_TARGETS[0];
+      const targets = EXERCISE_TARGETS[exerciseIndex] ?? EXERCISE_TARGETS[0];
       const elapsed = (now - exerciseStartTimeRef.current) / 1000;
       const dynamic = generateDynamicMessage(
         angles, prevAnglesRef.current, targets,
-        EXERCISE_NAMES[currentStep], elapsed,
+        EXERCISE_NAMES[exerciseIndex], elapsed,
         compensations
       );
       // Skip if too similar to a recent message
@@ -472,19 +460,33 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
       prevAnglesRef.current = { ...angles };
     }, 3000);
     return () => clearInterval(interval);
-  }, [isLive, useCamera, currentStep, angles, compensations, lumbarAlert, addCoachMessage, speakCoachMessage, generateDynamicMessage]);
+  }, [isLive, useCamera, exerciseIndex, angles, compensations, lumbarAlert, addCoachMessage, speakCoachMessage, generateDynamicMessage]);
+
+  // Auto-stop session when timer reaches selected session duration (in minutes)
+  useEffect(() => {
+    if (!isLive) return;
+    if (!sessionDuration || sessionDuration <= 0) return;
+    const maxSeconds = sessionDuration * 60;
+    if (timer >= maxSeconds) {
+      const now = Date.now();
+      addCoachMessage({ id: `end-${now}`, text: "Session terminée — infos enregistrées.", type: "info", timestamp: now });
+      stopLive();
+      onToggleLive();
+    }
+  }, [timer, isLive, sessionDuration, stopLive, onToggleLive, addCoachMessage]);
 
   // Handlers
   const handleToggle = useCallback(() => {
-    if (isLive) stopLive();
-    else startLive(EXERCISE_NAMES.length);
+    if (isLive) {
+      stopLive();
+      onToggleLive();
+      return;
+    }
+    setActiveExerciseIndex(selectedExerciseIndex);
+    setSessionDuration(selectedDuration);
+    startLive(1);
     onToggleLive();
-  }, [isLive, startLive, stopLive, onToggleLive]);
-
-  const handleNext = useCallback(() => {
-    if (currentStep >= exerciseCount - 1) { stopLive(); onToggleLive(); }
-    else nextStep();
-  }, [currentStep, exerciseCount, nextStep, stopLive, onToggleLive]);
+  }, [isLive, startLive, stopLive, onToggleLive, selectedExerciseIndex, selectedDuration]);
 
   // Derived values
   const formatTimer = (s: number) => {
@@ -504,13 +506,13 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
       }));
   })();
 
-  const targets = EXERCISE_TARGETS[currentStep] ?? EXERCISE_TARGETS[0];
+  const targets = EXERCISE_TARGETS[exerciseIndex] ?? EXERCISE_TARGETS[0];
+  const epauleValue = Math.round(((angles.shoulderLeft ?? 0) + (angles.shoulderRight ?? 0)) / 2);
+  const coudeValue = Math.round(((angles.elbowLeft ?? 0) + (angles.elbowRight ?? 0)) / 2);
   const angleLabels = [
-    { key: "shoulderLeft", label: "Épaule G.", target: targets.shoulderLeft },
-    { key: "shoulderRight", label: "Épaule D.", target: targets.shoulderRight },
-    { key: "elbowLeft", label: "Coude G.", target: targets.elbowLeft },
-    { key: "spine", label: "Colonne", target: targets.spine },
-    { key: "hip", label: "Hanche", target: targets.hip },
+    { key: "epaule", label: "Épaule", value: epauleValue, target: Math.round((targets.shoulderLeft + targets.shoulderRight) / 2) },
+    { key: "coude", label: "Coude", value: coudeValue, target: Math.round((targets.elbowLeft + targets.elbowRight) / 2) },
+    { key: "poigne", label: "Poigné", value: angles.spine ?? 0, target: targets.spine },
   ];
 
   // === CONDITIONAL RETURNS AFTER ALL HOOKS ===
@@ -535,16 +537,38 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
             exercice par exercice.
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <Button variant={useCamera ? "default" : "outline"} size="sm" onClick={() => setUseCamera(!useCamera)} className={useCamera ? "bg-primary hover:bg-primary/90" : ""}>
-            <Camera className="w-4 h-4 mr-2" />
-            Caméra {useCamera ? "activée" : "désactivée"}
-          </Button>
+        <div className="w-full max-w-2xl">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <div className="flex items-center gap-3">
+              <Button variant={useCamera ? "default" : "outline"} size="sm" onClick={() => setUseCamera(!useCamera)} className={useCamera ? "bg-primary hover:bg-primary/90" : ""}>
+                <Camera className="w-4 h-4 mr-2" />
+                Caméra {useCamera ? "activée" : "désactivée"}
+              </Button>
+            </div>
+
+            <div className="flex-1">
+              <p className="text-sm font-medium mb-2">Choisir l'exercice</p>
+              <div className="flex gap-2 flex-wrap">
+                {EXERCISE_NAMES.map((n, i) => (
+                  <Button key={n} variant={i === selectedExerciseIndex ? "default" : "outline"} size="sm" onClick={() => setSelectedExerciseIndex(i)}>
+                    {n}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            <div className="w-48">
+              <p className="text-sm font-medium mb-2">Durée: {selectedDuration} min</p>
+              <Slider value={[selectedDuration]} min={1} max={30} onValueChange={(v: number[]) => setSelectedDuration(v[0])} />
+            </div>
+          </div>
+          <div className="mt-4 flex justify-center">
+            <Button onClick={handleToggle} size="lg" className="bg-primary hover:bg-primary/90 shadow-md px-8">
+              <Play className="w-5 h-5 mr-2" />
+              Démarrer la session
+            </Button>
+          </div>
         </div>
-        <Button onClick={handleToggle} size="lg" className="bg-primary hover:bg-primary/90 shadow-md px-8">
-          <Play className="w-5 h-5 mr-2" />
-          Démarrer la session
-        </Button>
       </div>
     );
   }
@@ -571,33 +595,20 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
           <Button variant="outline" size="sm" onClick={handleToggle} className="text-destructive hover:bg-destructive/10">
             <Square className="w-3.5 h-3.5 mr-1.5" /> Arrêter
           </Button>
-          <Button size="sm" onClick={handleNext} className="bg-primary hover:bg-primary/90 shadow-md">
-            <SkipForward className="w-3.5 h-3.5 mr-1.5" /> Suivant
-          </Button>
+          {/* Single-exercise mode: removed stepper 'Suivant' button */}
         </div>
       </div>
 
-      {/* Exercise Stepper */}
-      <div className="flex items-center gap-3 p-3 rounded-xl bg-white shadow-sm overflow-x-auto">
-        {EXERCISE_NAMES.map((name, idx) => {
-          const isActive = idx === currentStep;
-          const isDone = idx < currentStep;
-          return (
-            <div key={idx} className="flex items-center gap-2 shrink-0">
-              {idx > 0 && <div className={`w-6 h-0.5 ${isDone ? "bg-primary" : "bg-muted"}`} />}
-              <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-all ${
-                isActive ? "bg-primary text-white font-medium shadow-md"
-                  : isDone ? "bg-primary/10 text-primary"
-                  : "bg-muted text-muted-foreground"
-              }`}>
-                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
-                  isActive ? "bg-white text-primary" : isDone ? "bg-primary text-white" : "bg-muted-foreground/20 text-muted-foreground"
-                }`}>{isDone ? "\u2713" : idx + 1}</span>
-                <span className="hidden sm:inline">{name}</span>
-              </div>
-            </div>
-          );
-        })}
+      {/* Active exercise info (single-exercise mode) */}
+      <div className="p-3 rounded-xl bg-white shadow-sm">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs text-muted-foreground">Exercice actif</p>
+            <h3 className="text-lg font-bold">{EXERCISE_NAMES[exerciseIndex]}</h3>
+            <p className="text-sm text-muted-foreground">Durée: {sessionDuration} min</p>
+          </div>
+          <div className="text-sm text-muted-foreground">{useCamera ? "Caméra activée" : "Mode démonstration"}</div>
+        </div>
       </div>
 
       {/* Main Content Grid */}
@@ -616,7 +627,7 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
                         <Dumbbell className="w-8 h-8 text-white/60" />
                       </div>
                       <p className="text-white/70 text-[10px] mt-3">Mode démonstration</p>
-                      <p className="text-white/50 text-[10px]">{EXERCISE_NAMES[currentStep]}</p>
+                      <p className="text-white/50 text-[10px]">{EXERCISE_NAMES[exerciseIndex]}</p>
                     </div>
                   </div>
                 )}
@@ -654,16 +665,16 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
                 {useCamera ? "Angles articulaires (détection IA)" : "Angles articulaires (simulation)"}
               </p>
               <div className="space-y-3">
-                {angleLabels.map(({ key, label, target }) => {
-                  const value = angles[key] ?? 0;
-                  const diff = Math.abs(value - target);
+                {angleLabels.map(({ key, label, value, target }) => {
+                  const v = value ?? 0;
+                  const diff = Math.abs(v - target);
                   const ok = diff <= 10;
-                  const pct = Math.min(100, Math.round((value / Math.max(1, target)) * 100));
+                  const pct = Math.min(100, Math.round((v / Math.max(1, target)) * 100));
                   return (
                     <div key={key} className="space-y-1">
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-muted-foreground">{label}</span>
-                        <span className={`text-xs font-bold ${ok ? "text-primary" : "text-chart-3"}`}>{Math.round(value)}°</span>
+                        <span className={`text-xs font-bold ${ok ? "text-primary" : "text-chart-3"}`}>{Math.round(v)}°</span>
                       </div>
                       <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                         <div className={`h-full rounded-full transition-all duration-300 ${ok ? "bg-primary" : "bg-chart-3"}`} style={{ width: `${Math.min(100, pct)}%` }} />
