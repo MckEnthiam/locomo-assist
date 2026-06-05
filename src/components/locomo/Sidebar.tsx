@@ -18,14 +18,8 @@ const links = [
   { key: "parametres", label: "Paramètres", icon: Settings },
 ];
 
-const previewImageMap: Record<string, string> = {
-  dashboard: "dashboard.png",
-  planning: "planning.png",
-  session: "session.png",
-  progression: "progression.png",
-  rapports: "rapports.png",
-  parametres: "parametres.png",
-};
+// Preview image mapping is hardcoded inline below to avoid dynamic variable lookup
+
 
 interface SidebarProps {
   activeTab: string;
@@ -39,7 +33,22 @@ export function Sidebar({
   const [previewKey, setPreviewKey] = useState<string | undefined>(undefined);
   const [imageLoaded, setImageLoaded] = useState(true);
   const currentPreview = previewKey ?? activeTab;
-  const previewImage = previewImageMap[currentPreview] ?? `${currentPreview}.png`;
+  let previewImage = "";
+  if (currentPreview === "dashboard") {
+    previewImage = "dashboard.png";
+  } else if (currentPreview === "planning") {
+    previewImage = "planning.png";
+  } else if (currentPreview === "session") {
+    previewImage = "session.png";
+  } else if (currentPreview === "progression") {
+    previewImage = "progression.png";
+  } else if (currentPreview === "rapports") {
+    previewImage = "rapports.png";
+  } else if (currentPreview === "parametres") {
+    previewImage = "parametres.png";
+  } else {
+    previewImage = `${currentPreview}.png`;
+  }
 
   useEffect(() => {
     setImageLoaded(false);
