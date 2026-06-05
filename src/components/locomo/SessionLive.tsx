@@ -611,61 +611,71 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid gap-4 lg:grid-cols-3">
-        <div className="lg:col-span-2 space-y-4">
-          {/* Camera View */}
-          <Card className="border-0 shadow-sm">
-            <CardContent className="p-4">
-              <div className="text-xs text-muted-foreground mb-3 flex items-center gap-1.5">
-                {useCamera ? (
-                  <><span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse inline-block" /> Caméra active — Analyse en cours</>
-                ) : (
-                  <><Dumbbell className="w-3.5 h-3.5" /> Mode démonstration — {EXERCISE_NAMES[currentStep]}</>
-                )}
-              </div>
-              {useCamera ? (
-                <CameraView active={isLive} onAngles={handleCameraAngles} />
-              ) : (
-                <div className="relative aspect-video rounded-lg overflow-hidden bg-gradient-to-br from-[#085041] via-[#1D9E75] to-[#085041]">
-                  <div className="absolute inset-0 bg-black/20" />
-                  <div className="absolute inset-0 flex flex-col items-center justify-center relative z-10">
-                    <div className="w-16 h-16 rounded-full border-2 border-white/40 flex items-center justify-center">
-                      <Dumbbell className="w-8 h-8 text-white/60" />
-                    </div>
-                    <p className="text-white/70 text-[10px] mt-2">Mode démonstration</p>
-                    <p className="text-white/50 text-[10px]">{EXERCISE_NAMES[currentStep]}</p>
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.8fr)_minmax(320px,0.9fr)]">
+        <div className="space-y-4">
+          <Card className="border-0 shadow-sm overflow-hidden">
+            <CardContent className="p-0 relative bg-slate-900/95">
+              <div className="absolute left-6 top-6 w-[320px] rounded-3xl border border-white/10 bg-slate-950/90 p-4 shadow-2xl shadow-slate-950/20">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.28em] text-slate-400">
+                    <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse inline-block" />
+                    Caméra active
                   </div>
+                  <Badge variant="outline" className="bg-slate-800/70 text-slate-200 border-slate-700/80 text-[10px]">
+                    LIVE
+                  </Badge>
                 </div>
-              )}
-            </CardContent>
-          </Card>
+                <div className="rounded-3xl overflow-hidden border border-white/10 bg-black/80">
+                  {useCamera ? (
+                    <div className="h-48 overflow-hidden bg-black">
+                      <CameraView active={isLive} onAngles={handleCameraAngles} />
+                    </div>
+                  ) : (
+                    <div className="h-48 relative bg-gradient-to-br from-[#085041] via-[#1D9E75] to-[#085041]">
+                      <div className="absolute inset-0 bg-black/20" />
+                      <div className="absolute inset-0 flex flex-col items-center justify-center relative z-10 text-center px-3">
+                        <div className="w-16 h-16 rounded-full border-2 border-white/40 flex items-center justify-center">
+                          <Dumbbell className="w-8 h-8 text-white/60" />
+                        </div>
+                        <p className="text-white/70 text-[10px] mt-3">Mode démonstration</p>
+                        <p className="text-white/50 text-[10px]">{EXERCISE_NAMES[currentStep]}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
 
-          {/* Signal Chart */}
-          <Card className="border-0 shadow-sm">
-            <CardContent className="p-4">
-              {lumbarAlert && (
-                <div className="flex items-center gap-2 mb-3 px-3 py-2 rounded-lg bg-red-50 border border-red-200 text-red-700 text-xs font-medium">
-                  <AlertTriangle className="w-3.5 h-3.5" />
-                  Compensation lombaire détectée — Redressez votre dos
+              <div className="pt-52 px-6 pb-6">
+                <div className="flex items-center justify-between gap-4 mb-4">
+                  <div>
+                    <p className="text-xs text-slate-400 uppercase tracking-[0.28em] mb-2">Signal articulaire</p>
+                    <h2 className="text-2xl font-semibold text-white">Graphique temps réel</h2>
+                    <p className="text-sm text-slate-400 mt-1">{EXERCISE_NAMES[currentStep]}</p>
+                  </div>
+                  {lumbarAlert && (
+                    <div className="inline-flex items-center gap-2 rounded-2xl bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 border border-red-200">
+                      <AlertTriangle className="w-4 h-4" /> Compensation lombaire détectée
+                    </div>
+                  )}
                 </div>
-              )}
-              <p className="text-xs text-muted-foreground mb-2">Signal articulaire en temps réel — {EXERCISE_NAMES[currentStep]}</p>
-              <ResponsiveContainer width="100%" height={200}>
-                <LineChart data={signalData}>
-                  <XAxis dataKey="t" tick={{ fontSize: 9 }} stroke="#9CA3AF" />
-                  <YAxis domain={[-500, 500]} tick={{ fontSize: 9 }} stroke="#9CA3AF" />
-                  <ReferenceLine y={0} stroke="rgba(0,0,0,0.08)" />
-                  <Line type="monotone" dataKey="shoulder" stroke="#1D9E75" dot={false} strokeWidth={2} isAnimationActive={false} name="Épaule" />
-                  <Line type="monotone" dataKey="spine" stroke="#EF9F27" dot={false} strokeWidth={2} isAnimationActive={false} name="Colonne" />
-                </LineChart>
-              </ResponsiveContainer>
+                <div className="w-full h-[460px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={signalData}>
+                      <XAxis dataKey="t" tick={{ fontSize: 10, fill: "#94A3B8" }} stroke="#334155" />
+                      <YAxis domain={[-500, 500]} tick={{ fontSize: 10, fill: "#94A3B8" }} stroke="#334155" />
+                      <ReferenceLine y={0} stroke="rgba(148,163,184,0.3)" />
+                      <Line type="monotone" dataKey="shoulder" stroke="#22C55E" dot={false} strokeWidth={3} isAnimationActive={false} name="Épaule" />
+                      <Line type="monotone" dataKey="spine" stroke="#F97316" dot={false} strokeWidth={3} isAnimationActive={false} name="Colonne" />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Right Panel */}
-        <div className="space-y-4">
-          {/* Angles */}
+        <aside className="space-y-4">
           <Card className="border-0 shadow-sm">
             <CardContent className="p-4">
               <p className="text-xs font-semibold text-muted-foreground mb-3">
@@ -694,7 +704,6 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
             </CardContent>
           </Card>
 
-          {/* Coach */}
           <Card className="border-0 shadow-sm">
             <CardContent className="p-4">
               <p className="text-xs font-semibold text-muted-foreground mb-3 flex items-center gap-1.5">
@@ -703,7 +712,7 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
                 {voiceEnabled && <Volume2 className="w-3 h-3 text-primary/60 ml-1" />}
                 {!voiceEnabled && <VolumeX className="w-3 h-3 text-muted-foreground/40 ml-1" />}
               </p>
-              <div className="space-y-2 max-h-48 overflow-y-auto">
+              <div className="space-y-2 max-h-52 overflow-y-auto">
                 {coachMessages.length === 0 ? (
                   <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/50">
                     <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center"><Mic className="w-2.5 h-2.5 text-primary" /></div>
@@ -727,7 +736,6 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
             </CardContent>
           </Card>
 
-          {/* Compensations */}
           <Card className="border-0 shadow-sm">
             <CardContent className="p-4">
               <p className="text-xs font-semibold text-muted-foreground mb-2">Compensations</p>
@@ -743,7 +751,7 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
               </div>
             </CardContent>
           </Card>
-        </div>
+        </aside>
       </div>
     </div>
   );
