@@ -604,7 +604,7 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1.8fr)_minmax(320px,0.9fr)]">
         <div className="space-y-4">
           <Card className="border-0 shadow-sm overflow-hidden">
-            <CardContent className="p-0 relative bg-slate-900/95">
+            <CardContent className="p-0 relative bg-white">
               <div className="absolute left-6 top-6 w-[320px] h-48 rounded-3xl border border-white/10 bg-slate-950/90 overflow-hidden shadow-2xl shadow-slate-950/20">
                 {useCamera ? (
                   <CameraView active={isLive} onAngles={handleCameraAngles} />
@@ -623,26 +623,21 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
               </div>
 
               <div className="pt-52 px-6 pb-6">
-                <div className="flex items-center justify-between gap-4 mb-4">
-                  <div>
-                    <p className="text-xs text-slate-400 uppercase tracking-[0.28em] mb-2">Signal articulaire</p>
-                    <h2 className="text-2xl font-semibold text-white">Graphique temps réel</h2>
-                    <p className="text-sm text-slate-400 mt-1">{EXERCISE_NAMES[currentStep]}</p>
-                  </div>
+                <div className="flex items-center justify-between gap-4 mb-0">
                   {lumbarAlert && (
                     <div className="inline-flex items-center gap-2 rounded-2xl bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 border border-red-200">
                       <AlertTriangle className="w-4 h-4" /> Compensation lombaire détectée
                     </div>
                   )}
                 </div>
-                <div className="w-full h-[460px]">
+                <div className="w-full h-[520px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={signalData}>
                       <XAxis dataKey="t" tick={{ fontSize: 10, fill: "#94A3B8" }} stroke="#334155" />
                       <YAxis domain={[-500, 500]} tick={{ fontSize: 10, fill: "#94A3B8" }} stroke="#334155" />
                       <ReferenceLine y={0} stroke="rgba(148,163,184,0.3)" />
-                      <Line type="monotone" dataKey="shoulder" stroke="#22C55E" dot={false} strokeWidth={3} isAnimationActive={false} name="Épaule" />
-                      <Line type="monotone" dataKey="spine" stroke="#F97316" dot={false} strokeWidth={3} isAnimationActive={false} name="Colonne" />
+                      <Line type="linear" dataKey="shoulder" stroke="#22C55E" dot={false} strokeWidth={3} isAnimationActive={false} name="Épaule" />
+                      <Line type="linear" dataKey="spine" stroke="#F97316" dot={false} strokeWidth={3} isAnimationActive={false} name="Colonne" />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
