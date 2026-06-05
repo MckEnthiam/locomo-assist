@@ -73,7 +73,7 @@ export function Sidebar({
       <div className="px-3 py-4">
         <div className="w-full h-40 rounded-lg overflow-hidden bg-slate-50 flex items-center justify-center border border-slate-100">
           <img
-            src={`/memphis-assets/${(previewKey ?? activeTab)}.png`}
+            src={`/memphis-assets/${(previewKey ?? activeTab)}.svg`}
             alt={previewKey ?? activeTab}
             className="w-full h-full object-cover"
             onError={(e) => {
