@@ -19,12 +19,12 @@ const links = [
 ];
 
 const previewImageMap: Record<string, string> = {
-  dashboard: "Tableau de bord.png",
-  planning: "Planning.png",
-  session: "Session live.png",
-  progression: "Progression.png",
-  rapports: "Rapports.png",
-  parametres: "Parametres.png",
+  dashboard: "dashboard.png",
+  planning: "planning.png",
+  session: "session.png",
+  progression: "progression.png",
+  rapports: "rapports.png",
+  parametres: "parametres.png",
 };
 
 interface SidebarProps {
