@@ -186,13 +186,13 @@ export default function Home() {
 
   // (Removed login redirect — demo user is auto-created on mount)
 
-  // Logout function
-  const handleLogout = useCallback(() => {
-    localStorage.removeItem("locomo-auth");
-    localStorage.removeItem("locomo-user");
-    setUser(null);
-    router.replace("/login");
-  }, [router]);
+  // Logout function (removed - no longer needed)
+  // const handleLogout = useCallback(() => {
+  //   localStorage.removeItem("locomo-auth");
+  //   localStorage.removeItem("locomo-user");
+  //   setUser(null);
+  //   router.replace("/login");
+  // }, [router]);
 
   // Default fallback data so dashboard always shows content
   const FALLBACK_DATA: Record<string, unknown> = {
@@ -336,8 +336,6 @@ export default function Home() {
           onTabChange={handleTabChange}
           userName={user.name}
           userEmail={user.email}
-          userRole={user.role}
-          onLogout={handleLogout}
         />
       </div>
 

@@ -18,7 +18,8 @@ import {
   X,
   Printer,
 } from "lucide-react";
-// CSS transitions used instead of framer-motion for reliability
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 interface ReportItem {
   id: string;
@@ -248,9 +249,10 @@ function ActivityIcon(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
-// Generate and download a report as an HTML file
-function downloadReportAsHTML(report: ReportItem) {
+// Generate and download a report as a PDF file
+async function downloadReportAsPDF(report: ReportItem) {
   const summary = report.summary;
+  const userName = "Patient Demo";
   const exercisesHTML = summary?.exercises
     ? summary.exercises.map((ex, i) => `
       <tr>
@@ -353,15 +355,52 @@ function downloadReportAsHTML(report: ReportItem) {
 </body>
 </html>`;
 
-  const blob = new Blob([html], { type: "text/html;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `rapport-locomo-assist-semaine-${report.weekNumber}.html`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  // Create container for HTML to PDF conversion
+  const container = document.createElement("div");
+  container.style.position = "absolute";
+  container.style.left = "-9999px";
+  container.style.width = "210mm";
+  container.style.background = "white";
+  container.style.padding = "20mm";
+  container.style.fontFamily = "Arial, sans-serif";
+  container.innerHTML = html;
+  document.body.appendChild(container);
+  
+  try {
+    // Convert to canvas and then PDF
+    const canvas = await html2canvas(container, {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      backgroundColor: "#ffffff"
+    });
+    
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4"
+    });
+    
+    const imgData = canvas.toDataURL("image/png");
+    const imgWidth = 210;
+    const pageHeight = 297;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    
+    let position = 0;
+    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+    
+    let heightLeft = imgHeight - pageHeight;
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
+    
+    pdf.save(`rapport-locomo-assist-semaine-${report.weekNumber}.pdf`);
+  } finally {
+    document.body.removeChild(container);
+  }
 }
 
 // Download a training guide as a text file
@@ -393,8 +432,15 @@ function ReportPreview({ report, onClose }: { report: ReportItem; onClose: () =>
             Apercu du rapport — Semaine {report.weekNumber}
           </h3>
           <div className="flex items-center gap-2">
-            <Button size="sm" variant="outline" onClick={() => { downloadReportAsHTML(report); onClose(); }}>
-              <Download className="w-3.5 h-3.5 mr-1" /> Télécharger
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={async () => {
+                await downloadReportAsPDF(report);
+                onClose();
+              }}
+            >
+              <Download className="w-3.5 h-3.5 mr-1" /> Télécharger PDF
             </Button>
             <Button size="sm" variant="outline" onClick={() => window.print()}>
               <Printer className="w-3.5 h-3.5 mr-1" /> Imprimer
@@ -694,7 +740,7 @@ export function Rapports() {
                             variant="secondary"
                             className="bg-primary/10 text-primary text-[10px]"
                           >
-                            HTML
+                            PDF
                           </Badge>
                         </div>
                         <p className="text-xs text-muted-foreground flex items-center gap-1.5 mt-1">
@@ -747,10 +793,10 @@ export function Rapports() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => downloadReportAsHTML(r)}
+                        onClick={async () => await downloadReportAsPDF(r)}
                       >
                         <Download className="w-3.5 h-3.5 mr-1.5" />
-                        Télécharger
+                        Télécharger PDF
                       </Button>
                     </div>
                   </div>

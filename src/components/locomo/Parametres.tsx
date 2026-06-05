@@ -14,8 +14,6 @@ import {
   Bell,
   BellOff,
   RefreshCw,
-  Trash2,
-  LogOut,
   Monitor,
   Shield,
   Globe,
@@ -91,10 +89,6 @@ export function Parametres() {
       setNotifications(true);
       document.documentElement.classList.remove("dark");
     }
-  }
-
-  function handleDeleteAccount() {
-    alert("Mode de\u0301monstration : suppression de compte non disponible.");
   }
 
   const SettingToggle = ({
@@ -269,21 +263,7 @@ export function Parametres() {
               Réinitialiser
             </Button>
           </div>
-          <div className="flex items-center justify-between p-4 rounded-xl bg-red-50 border border-red-100">
-            <div className="flex items-start gap-3">
-              <div className="p-2 rounded-lg bg-white shadow-sm shrink-0">
-                <Trash2 className="w-4 h-4 text-red-500" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-red-700">Supprimer le compte</p>
-                <p className="text-[11px] text-red-400">Toutes vos données seront perdues</p>
-              </div>
-            </div>
-            <Button variant="outline" size="sm" onClick={handleDeleteAccount} className="text-xs text-red-600 border-red-200 hover:bg-red-100 shrink-0">
-              <LogOut className="w-3.5 h-3.5 mr-1" />
-              Supprimer
-            </Button>
-          </div>
+
         </div>
       </div>
     </div>
