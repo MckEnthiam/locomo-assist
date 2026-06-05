@@ -18,6 +18,15 @@ const links = [
   { key: "parametres", label: "Paramètres", icon: Settings },
 ];
 
+const previewImageMap: Record<string, string> = {
+  dashboard: "Tableau de bord.png",
+  planning: "Planning.png",
+  session: "Session live.png",
+  progression: "Progression.png",
+  rapports: "Rapports.png",
+  parametres: "Parametres.png",
+};
+
 interface SidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
@@ -30,10 +39,11 @@ export function Sidebar({
   const [previewKey, setPreviewKey] = useState<string | undefined>(undefined);
   const [imageLoaded, setImageLoaded] = useState(true);
   const currentPreview = previewKey ?? activeTab;
+  const previewImage = previewImageMap[currentPreview] ?? `${currentPreview}.png`;
 
   useEffect(() => {
     setImageLoaded(false);
-  }, [currentPreview]);
+  }, [previewImage]);
 
   return (
     <aside className="flex w-72 shrink-0 flex-col bg-white border-r border-slate-200/80 shadow-sm h-screen overflow-y-auto">
@@ -80,7 +90,7 @@ export function Sidebar({
       <div className="px-3 py-4">
         <div className="w-full h-40 rounded-lg overflow-hidden bg-slate-50 flex items-center justify-center border border-slate-100">
           <img
-            src={`/memphis-assets/${currentPreview}.png`}
+            src={`/memphis-assets/${previewImage}`}
             alt={currentPreview}
             className={`w-full h-full object-cover transition-opacity duration-500 ease-out ${imageLoaded ? "opacity-100" : "opacity-0"}`}
             onLoad={() => setImageLoaded(true)}
