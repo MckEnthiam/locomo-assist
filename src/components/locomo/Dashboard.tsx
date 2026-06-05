@@ -91,21 +91,6 @@ export function Dashboard({
     }
   }, []);
 
-  // Only show skeleton while actively loading; always use data (fallback if needed)
-  if (loading) {
-    return (
-      <div className="space-y-6 animate-pulse">
-        <div className="h-28 rounded-xl bg-muted" />
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-28 rounded-xl bg-muted" />
-          ))}
-        </div>
-        <div className="h-80 rounded-xl bg-muted" />
-      </div>
-    );
-  }
-
   // Use API data if available, otherwise use built-in demo data
   const data = (dashboardData ?? DEFAULT_DATA) as {
     totalSessions: number;
