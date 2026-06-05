@@ -10,7 +10,6 @@ import {
   YAxis,
 } from "recharts";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Activity,
@@ -524,7 +523,7 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
           <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center p-2">
             <img src="/logo.png" alt="Locomo-assist" className="w-16 h-16 object-contain" />
           </div>
-          <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-primary animate-pulse-green flex items-center justify-center">
+          <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-primary animate-pulse flex items-center justify-center">
             <Mic className="w-3 h-3 text-white" />
           </div>
         </div>
@@ -542,7 +541,7 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
             Caméra {useCamera ? "activée" : "désactivée"}
           </Button>
         </div>
-        <Button onClick={handleToggle} size="lg" className="bg-primary hover:bg-primary/90 shadow-xl shadow-primary/30 px-8">
+        <Button onClick={handleToggle} size="lg" className="bg-primary hover:bg-primary/90 shadow-md px-8">
           <Play className="w-5 h-5 mr-2" />
           Démarrer la session
         </Button>
@@ -556,19 +555,10 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
       {/* Timer + Controls */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white font-mono text-lg font-bold shadow-lg shadow-primary/25">
+          <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white font-mono text-lg font-bold shadow-md">
             <Timer className="w-4 h-4" />
             {formatTimer(timer)}
           </div>
-          <Badge variant="outline" className="bg-red-50 text-red-600 border-red-200 animate-pulse">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5 inline-block" />
-            EN DIRECT
-          </Badge>
-          {useCamera ? (
-            <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200"><Camera className="w-3 h-3 mr-1" /> Caméra active</Badge>
-          ) : (
-            <Badge variant="outline" className="bg-amber-50 text-amber-600 border-amber-200"><VolumeX className="w-3 h-3 mr-1" /> Mode démo</Badge>
-          )}
         </div>
         <div className="flex items-center gap-2">
           <Button variant={voiceEnabled ? "default" : "outline"} size="sm" onClick={() => setVoiceEnabled(!voiceEnabled)} className={voiceEnabled ? "bg-primary hover:bg-primary/90" : ""}>
@@ -581,7 +571,7 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
           <Button variant="outline" size="sm" onClick={handleToggle} className="text-destructive hover:bg-destructive/10">
             <Square className="w-3.5 h-3.5 mr-1.5" /> Arrêter
           </Button>
-          <Button size="sm" onClick={handleNext} className="bg-primary hover:bg-primary/90 shadow-md shadow-primary/20">
+          <Button size="sm" onClick={handleNext} className="bg-primary hover:bg-primary/90 shadow-md">
             <SkipForward className="w-3.5 h-3.5 mr-1.5" /> Suivant
           </Button>
         </div>
@@ -596,7 +586,7 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
             <div key={idx} className="flex items-center gap-2 shrink-0">
               {idx > 0 && <div className={`w-6 h-0.5 ${isDone ? "bg-primary" : "bg-muted"}`} />}
               <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-all ${
-                isActive ? "bg-primary text-white font-medium shadow-md shadow-primary/20"
+                isActive ? "bg-primary text-white font-medium shadow-md"
                   : isDone ? "bg-primary/10 text-primary"
                   : "bg-muted text-muted-foreground"
               }`}>
@@ -615,34 +605,21 @@ export function SessionLive({ isLive, onToggleLive }: SessionLiveProps) {
         <div className="space-y-4">
           <Card className="border-0 shadow-sm overflow-hidden">
             <CardContent className="p-0 relative bg-slate-900/95">
-              <div className="absolute left-6 top-6 w-[320px] rounded-3xl border border-white/10 bg-slate-950/90 p-4 shadow-2xl shadow-slate-950/20">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.28em] text-slate-400">
-                    <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse inline-block" />
-                    Caméra active
-                  </div>
-                  <Badge variant="outline" className="bg-slate-800/70 text-slate-200 border-slate-700/80 text-[10px]">
-                    LIVE
-                  </Badge>
-                </div>
-                <div className="rounded-3xl overflow-hidden border border-white/10 bg-black/80">
-                  {useCamera ? (
-                    <div className="h-48 overflow-hidden bg-black">
-                      <CameraView active={isLive} onAngles={handleCameraAngles} />
-                    </div>
-                  ) : (
-                    <div className="h-48 relative bg-gradient-to-br from-[#085041] via-[#1D9E75] to-[#085041]">
-                      <div className="absolute inset-0 bg-black/20" />
-                      <div className="absolute inset-0 flex flex-col items-center justify-center relative z-10 text-center px-3">
-                        <div className="w-16 h-16 rounded-full border-2 border-white/40 flex items-center justify-center">
-                          <Dumbbell className="w-8 h-8 text-white/60" />
-                        </div>
-                        <p className="text-white/70 text-[10px] mt-3">Mode démonstration</p>
-                        <p className="text-white/50 text-[10px]">{EXERCISE_NAMES[currentStep]}</p>
+              <div className="absolute left-6 top-6 w-[320px] h-48 rounded-3xl border border-white/10 bg-slate-950/90 overflow-hidden shadow-2xl shadow-slate-950/20">
+                {useCamera ? (
+                  <CameraView active={isLive} onAngles={handleCameraAngles} />
+                ) : (
+                  <div className="w-full h-full relative bg-gradient-to-br from-[#085041] via-[#1D9E75] to-[#085041]">
+                    <div className="absolute inset-0 bg-black/20" />
+                    <div className="absolute inset-0 flex flex-col items-center justify-center relative z-10 text-center px-3">
+                      <div className="w-16 h-16 rounded-full border-2 border-white/40 flex items-center justify-center">
+                        <Dumbbell className="w-8 h-8 text-white/60" />
                       </div>
+                      <p className="text-white/70 text-[10px] mt-3">Mode démonstration</p>
+                      <p className="text-white/50 text-[10px]">{EXERCISE_NAMES[currentStep]}</p>
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
 
               <div className="pt-52 px-6 pb-6">

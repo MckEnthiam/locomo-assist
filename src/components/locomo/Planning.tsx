@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CalendarDays, Clock, Dumbbell, ChevronRight } from "lucide-react";
 
@@ -147,17 +146,18 @@ export function Planning({ onStartSession }: PlanningProps) {
                           {day.label}
                         </CardTitle>
                         {isToday && (
-                          <Badge className="bg-primary text-white text-[10px] px-1.5 py-0">
+                          <span className="text-[10px] font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-md border border-primary/20">
                             Aujourd&apos;hui
-                          </Badge>
+                          </span>
                         )}
                       </div>
-                      <Badge
-                        variant="outline"
-                        className={DAY_COLORS[day.dayOfWeek] ?? ""}
+                      <span
+                        className={`text-[10px] font-semibold px-2 py-0.5 rounded-md border ${
+                          DAY_COLORS[day.dayOfWeek] ?? ""
+                        }`}
                       >
                         {day.bodyPart}
-                      </Badge>
+                      </span>
                     </div>
                     <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
                       <Clock className="w-3 h-3" />
