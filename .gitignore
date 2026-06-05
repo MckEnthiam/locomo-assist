@@ -1,0 +1,12 @@
+.env
+__pycache__/
+*.pyc
+*.pyo
+*.pdf
+*.db
+.venv/
+venv/
+dist/
+build/
+reports/
+resources/models/*.task
