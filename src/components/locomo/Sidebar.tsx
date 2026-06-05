@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
@@ -26,6 +27,7 @@ export function Sidebar({
   activeTab,
   onTabChange,
 }: SidebarProps) {
+  const [previewKey, setPreviewKey] = useState<string | undefined>(undefined);
   return (
     <aside className="flex w-72 shrink-0 flex-col bg-white border-r border-slate-200/80 shadow-sm h-screen overflow-y-auto">
       <div className="p-6 border-b border-slate-200/80">
@@ -47,7 +49,12 @@ export function Sidebar({
           return (
             <button
               key={key}
-              onClick={() => onTabChange(key)}
+              onClick={() => {
+                onTabChange(key);
+                setPreviewKey(undefined);
+              }}
+              onMouseEnter={() => setPreviewKey(key)}
+              onMouseLeave={() => setPreviewKey(undefined)}
               className={cn(
                 "flex w-full items-center gap-3 rounded-3xl px-4 py-3 text-left text-sm transition-all duration-200",
                 active
@@ -61,6 +68,21 @@ export function Sidebar({
           );
         })}
       </nav>
+
+      {/* Image preview area for hovered/selected section */}
+      <div className="px-3 py-4">
+        <div className="w-full h-40 rounded-lg overflow-hidden bg-slate-50 flex items-center justify-center border border-slate-100">
+          <img
+            src={`/memphis-assets/${(previewKey ?? activeTab)}.png`}
+            alt={previewKey ?? activeTab}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              const t = e.target as HTMLImageElement;
+              if (t && t.src.indexOf("/logo.png") === -1) t.src = "/logo.png";
+            }}
+          />
+        </div>
+      </div>
     </aside>
   );
 }
