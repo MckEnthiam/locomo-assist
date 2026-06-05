@@ -13,7 +13,6 @@ import {
   Stethoscope,
   Calendar,
   Activity,
-  Trophy,
   Edit3,
   Save,
   X,
@@ -215,12 +214,7 @@ export function Profil() {
           </div>
 
           {/* Stats row */}
-          <div className="grid grid-cols-3 gap-3 mt-6">
-            <div className="p-3 rounded-xl bg-primary/5 text-center">
-              <Trophy className="w-4 h-4 text-primary mx-auto mb-1" />
-              <p className="text-lg font-bold text-primary">900</p>
-              <p className="text-[10px] text-muted-foreground">Points</p>
-            </div>
+          <div className="grid grid-cols-2 gap-3 mt-6">
             <div className="p-3 rounded-xl bg-chart-3/5 text-center">
               <Activity className="w-4 h-4 text-chart-3 mx-auto mb-1" />
               <p className="text-lg font-bold text-chart-3">5</p>
@@ -229,7 +223,7 @@ export function Profil() {
             <div className="p-3 rounded-xl bg-blue-50 text-center">
               <Clock className="w-4 h-4 text-blue-500 mx-auto mb-1" />
               <p className="text-lg font-bold text-blue-500">1h 40</p>
-              <p className="text-[10px] text-muted-foreground">Dur\u00e9e</p>
+              <p className="text-[10px] text-muted-foreground">Durée</p>
             </div>
           </div>
         </CardContent>

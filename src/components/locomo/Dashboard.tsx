@@ -19,12 +19,8 @@ import {
   Trophy,
   TrendingUp,
   TrendingDown,
-  Flame,
-  Star,
-  Zap,
-  Award,
-  Shield,
   Play,
+  Zap,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -58,16 +54,7 @@ const DEFAULT_DATA = {
   dayType: "Epaule et Hanche",
 };
 
-const BADGES = [
-  { id: "first-session", name: "Première session", description: "Terminé votre première session", icon: Trophy },
-  { id: "five-sessions", name: "Régulier", description: "5 sessions completées", icon: Star },
-  { id: "ten-sessions", name: "Déterminé", description: "10 sessions completées", icon: Zap },
-  { id: "good-form", name: "Bonne forme", description: "Score de forme > 80%", icon: Target },
-  { id: "perfect-form", name: "Parfait", description: "Score de forme > 95%", icon: Award },
-  { id: "streak-3", name: "En forme", description: "3 jours consécutifs", icon: Flame },
-  { id: "streak-7", name: "Semaine parfaite", description: "7 jours consécutifs", icon: Award },
-  { id: "low-comp", name: "Technicien", description: "Moins de 3 compensations/session", icon: Shield },
-];
+// Gamification badges removed
 
 const MOTIVATIONAL_MESSAGES = [
   "Chaque mouvement vous rapproche de votre objectif. Continuez !",
@@ -142,23 +129,7 @@ export function Dashboard({
     dayType: string;
   };
 
-  // Gamification calculations
-  const points = data.totalSessions * 100 + Math.floor(data.totalDurationSeconds / 60) * 5;
-  const streak = Math.min(data.totalSessions, 7); // demo streak
   const motivationalIndex = data.totalSessions % MOTIVATIONAL_MESSAGES.length;
-  const earnedBadges = BADGES.filter((badge) => {
-    switch (badge.id) {
-      case "first-session": return data.totalSessions >= 1;
-      case "five-sessions": return data.totalSessions >= 5;
-      case "ten-sessions": return data.totalSessions >= 10;
-      case "good-form": return data.formScore >= 80;
-      case "perfect-form": return data.formScore >= 95;
-      case "streak-3": return streak >= 3;
-      case "streak-7": return streak >= 7;
-      case "low-comp": return true; // demo
-      default: return false;
-    }
-  });
 
   const stats = [
     {
@@ -167,20 +138,6 @@ export function Dashboard({
       icon: Trophy,
       color: "text-primary",
       bgColor: "bg-primary/10",
-    },
-    {
-      label: "Points",
-      value: String(points),
-      icon: Star,
-      color: "text-amber-500",
-      bgColor: "bg-amber-50",
-    },
-    {
-      label: "Série",
-      value: `${streak} jour${streak > 1 ? "s" : ""}`,
-      icon: Flame,
-      color: "text-orange-500",
-      bgColor: "bg-orange-50",
     },
     {
       label: "Score de forme",
@@ -222,17 +179,12 @@ export function Dashboard({
               {MOTIVATIONAL_MESSAGES[motivationalIndex]}
             </p>
           </div>
-          {/* Points badge */}
-          <div className="shrink-0 p-3 rounded-xl bg-white/10 backdrop-blur-sm text-center">
-            <Star className="w-5 h-5 text-amber-300 mx-auto mb-1" />
-            <p className="text-xl font-bold">{points}</p>
-            <p className="text-[10px] text-white/60">Points</p>
-          </div>
+          {/* Points badge removed */}
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         {stats.map((s) => (
           <Card
             key={s.label}
@@ -256,42 +208,6 @@ export function Dashboard({
           </Card>
         ))}
       </div>
-
-      {/* Badges & Motivation */}
-      <Card className="border-0 shadow-sm">
-        <CardContent className="p-5">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold flex items-center gap-2">
-              <Award className="w-4 h-4 text-amber-500" />
-              Badges de réalisation
-            </h3>
-            <Badge variant="secondary" className="text-[10px]">
-              {earnedBadges.length}/{BADGES.length} débloqués
-            </Badge>
-          </div>
-          <div className="grid grid-cols-4 sm:grid-cols-8 gap-3">
-            {BADGES.map((badge) => {
-              const earned = earnedBadges.some((b) => b.id === badge.id);
-              return (
-                <div
-                  key={badge.id}
-                  className={`p-3 rounded-xl text-center transition-all ${
-                    earned
-                      ? "bg-amber-50 border border-amber-200 shadow-sm"
-                      : "bg-muted/50 opacity-40"
-                  }`}
-                  title={badge.description}
-                >
-                  <badge.icon className="mx-auto w-5 h-5 text-foreground" />
-                  <p className="text-[9px] font-medium mt-1 text-foreground truncate">
-                    {badge.name}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Charts & Today */}
       <div className="grid gap-6 lg:grid-cols-2">
