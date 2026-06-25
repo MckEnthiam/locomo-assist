@@ -3,7 +3,6 @@
   <img src="logo.png" alt="LocomoAssist Logo" width="180"/>
   <p><strong>Un kinésithérapeute virtuel dans votre poche.</strong></p>
   <p>
-    <img src="https://img.shields.io/badge/Hackathon-TCCHackDefend%202026-1D9E75?style=flat-square" alt="Hackathon"/>
     <img src="https://img.shields.io/badge/Stack-Next.js%2014%20%2B%20TypeScript-0070f3?style=flat-square" alt="Stack"/>
     <img src="https://img.shields.io/badge/IA-Groq%20%2B%20Gemini-4285F4?style=flat-square" alt="IA"/>
     <img src="https://img.shields.io/badge/Vision-MediaPipe%20Pose-EF9F27?style=flat-square" alt="Vision"/>
